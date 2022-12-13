@@ -1,0 +1,47 @@
+CREATE TABLE notoEntity (
+    id TEXT NOT NULL PRIMARY KEY,
+    title TEXT NOT NULL DEFAULT "",
+    content TEXT NOT NULL DEFAULT "",
+    owner TEXT NOT NULL,
+    category TEXT NOT NULL DEFAULT "",
+    synced  INTEGER AS Boolean DEFAULT 0,
+    dateCreated INTEGER NOT NULL,
+    lastSync INTEGER
+);
+
+CREATE TABLE locallyDeleted (
+    id TEXT NOT NULL PRIMARY KEY
+);
+
+getAllLocallyDeleted:
+SELECT *
+FROM locallyDeleted;
+
+locallyDeletedHandled:
+DELETE FROM locallyDeleted
+WHERE id = :id;
+
+addLocallyDeleted:
+INSERT OR REPLACE
+INTO locallyDeleted
+VALUES (?);
+
+getNotoById:
+SELECT *
+FROM notoEntity
+WHERE id = :id;
+
+getAllNotos:
+SELECT *
+FROM notoEntity;
+
+upsertNoto:
+INSERT OR REPLACE INTO notoEntity
+VALUES  (?, ?, ?, ?, ?, ?, ?, ?);
+
+deleteNotoById:
+DELETE FROM notoEntity
+WHERE id = :id;
+
+clearAllNotoEntitys:
+DELETE FROM notoEntity;
