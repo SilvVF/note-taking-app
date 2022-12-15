@@ -37,12 +37,6 @@ data class User(
     val profilePictureUrl: String? = null
 )
 
-sealed class Resource <T> {
-    class Loading <T> : Resource<T>()
-
-    data class Done <T> (val data: T?) : Resource<T>()
-}
-
 sealed class Priority(val value: Int) {
 
     object High : Priority(1)

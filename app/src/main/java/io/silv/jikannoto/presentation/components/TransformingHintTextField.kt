@@ -15,25 +15,21 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusEvent
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.silv.jikannoto.ui.theme.LocalCustomTheme
-import kotlinx.coroutines.launch
-
 @Composable
 fun AnimatedHintTextField(
     modifier: Modifier = Modifier,
@@ -44,7 +40,7 @@ fun AnimatedHintTextField(
     boxHeight: Dp = 50.dp,
     textChangeHandler: (String) -> Unit
 ) {
-    val scope = rememberCoroutineScope()
+
     val focusRequester = remember { FocusRequester() }
     val (hasFocus, setHasFocus) = remember { mutableStateOf(false) }
 
@@ -57,13 +53,9 @@ fun AnimatedHintTextField(
     ).value
 
     Box(
-        modifier
-            .focusRequester(focusRequester)
-            .onFocusEvent {
-                scope.launch {
-                    setHasFocus(it.hasFocus)
-                }
-            },
+        modifier.clickable {
+            focusRequester.requestFocus()
+        },
         contentAlignment = Alignment.Center
     ) {
         Row(
@@ -92,12 +84,14 @@ fun AnimatedHintTextField(
                         }
                     ).value.sp
                 )
-
                 BasicTextField(
                     value = text,
                     onValueChange = textChangeHandler,
                     modifier = Modifier
                         .focusRequester(focusRequester)
+                        .onFocusChanged {
+                            setHasFocus(it.hasFocus)
+                        }
                         .height(
                             animateDpAsState(
                                 targetValue = when {
@@ -106,7 +100,7 @@ fun AnimatedHintTextField(
                                 }
                             ).value
                         )
-                        .fillMaxWidth(0.9f)
+                        .fillMaxWidth()
                         .focusable(),
                     textStyle = TextStyle(
                         fontSize = fontSize.sp,
@@ -116,16 +110,21 @@ fun AnimatedHintTextField(
                     maxLines = 1
                 )
             }
-            AnimatedVisibility(
-                visible = text.isNotEmpty(),
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                IconButton(onClick = {
-                    textChangeHandler("")
-                }) {
-                    Icon(imageVector = Icons.Filled.Clear, contentDescription = "clear")
-                }
+        }
+        AnimatedVisibility(
+            visible = text.isNotEmpty(),
+            enter = fadeIn(),
+            exit = fadeOut(),
+            modifier = Modifier
+                .size(32.dp)
+                .offset(x = -(4).dp)
+                .clip(RoundedCornerShape(100))
+                .align(Alignment.CenterEnd)
+        ) {
+            IconButton(onClick = {
+                textChangeHandler("")
+            }) {
+                Icon(imageVector = Icons.Filled.Clear, contentDescription = "clear")
             }
         }
     }

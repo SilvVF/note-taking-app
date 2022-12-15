@@ -12,7 +12,6 @@ import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import io.silv.jikannoto.domain.models.NotoItem
 import io.silv.jikannoto.presentation.atoms.StickyHeaderColumn
@@ -47,11 +46,7 @@ fun NotoListScreen(
     val scope = rememberCoroutineScope()
 
     val color = LocalCustomTheme.current
-    val conf = LocalConfiguration.current
 
-    val (popupVisible, setPopupVisible) = remember {
-        mutableStateOf(false)
-    }
     BottomSheetScaffold(
         floatingActionButton = {
             AnimatedButton(

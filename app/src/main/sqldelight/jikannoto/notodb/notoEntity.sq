@@ -3,7 +3,7 @@ CREATE TABLE notoEntity (
     title TEXT NOT NULL DEFAULT "",
     content TEXT NOT NULL DEFAULT "",
     owner TEXT NOT NULL,
-    category TEXT NOT NULL DEFAULT "",
+    category TEXT NOT NULL DEFAULT "all",
     synced  INTEGER AS Boolean DEFAULT 0,
     dateCreated INTEGER NOT NULL,
     lastSync INTEGER

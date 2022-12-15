@@ -18,7 +18,7 @@ class UserRepositoryImpl(
     ): NotoApiResult<Nothing> = withContext(dispatcher.io) {
         try {
             val result = firebaseAuth.signInWithEmailAndPassword(username, password).await()
-            if (firebaseAuth.currentUser != null) {
+            if (result.user != null) {
                 NotoApiResult.Success()
             } else NotoApiResult.Exception("Unable to Sign in")
         } catch (e: Exception) {
@@ -43,7 +43,7 @@ class UserRepositoryImpl(
         try {
             firebaseAuth.createUserWithEmailAndPassword(username, password).await()
             val result = firebaseAuth.signInWithEmailAndPassword(username, password).await()
-            if (firebaseAuth.currentUser != null) {
+            if (result.user != null) {
                 NotoApiResult.Success()
             } else NotoApiResult.Exception("Unable to Sigjn in")
         } catch (e: Exception) {

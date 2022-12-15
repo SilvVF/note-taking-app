@@ -9,7 +9,6 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
 
 @Stable
 @Immutable
@@ -143,7 +142,6 @@ fun JikanNotoTheme(
         darkTheme -> DarkColors
         else -> LightColors
     }
-    val view = LocalView.current
     CompositionLocalProvider(
         LocalSpacing provides Spacing(), LocalCustomTheme providesDefault Light()
     ) {

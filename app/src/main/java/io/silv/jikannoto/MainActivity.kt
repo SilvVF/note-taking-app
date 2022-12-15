@@ -27,17 +27,6 @@ import org.orbitmvi.orbit.compose.collectAsState
 
 class MainActivity : ComponentActivity() {
 
-    private fun setWindowFlag(activity: Activity, bits: Int, on: Boolean) {
-        val win: Window = activity.window
-        val winParams: WindowManager.LayoutParams = win.attributes
-        if (on) {
-            winParams.flags = winParams.flags or bits
-        } else {
-            winParams.flags = winParams.flags and bits.inv()
-        }
-        win.attributes = winParams
-    }
-
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +35,6 @@ class MainActivity : ComponentActivity() {
         window.decorView.systemUiVisibility =
             View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 
-        // make fully Android Transparent Status bar
         // make fully Android Transparent Status bar
         setWindowFlag(this, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, false)
         window.statusBarColor = Color.TRANSPARENT
@@ -104,6 +92,16 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
+    }
+    private fun setWindowFlag(activity: Activity, bits: Int, on: Boolean) {
+        val win: Window = activity.window
+        val winParams: WindowManager.LayoutParams = win.attributes
+        if (on) {
+            winParams.flags = winParams.flags or bits
+        } else {
+            winParams.flags = winParams.flags and bits.inv()
+        }
+        win.attributes = winParams
     }
 }
 @Preview(showBackground = true)
