@@ -1,12 +1,20 @@
 package io.silv.jikannoto.presentation.screens.noto_view
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,12 +25,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.silv.jikannoto.domain.models.NotoItem
 import io.silv.jikannoto.presentation.components.AnimatedButton
+import io.silv.jikannoto.presentation.components.AnimatedHintTextField
 import io.silv.jikannoto.ui.theme.LocalCustomTheme
 import org.koin.androidx.compose.getViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun NotoView(
     notoItem: NotoItem?,
@@ -31,7 +40,6 @@ fun NotoView(
 ) {
 
     val state by viewModel.collectAsState()
-    val scope = rememberCoroutineScope()
     val color = LocalCustomTheme.current
 
     viewModel.collectSideEffect {
@@ -43,6 +51,10 @@ fun NotoView(
     LaunchedEffect(key1 = notoItem) {
         viewModel.initialNotoItem(notoItem)
     }
+
+    LaunchedEffect(key1 = state.categoryList, block = {
+        println(state.categoryList)
+    })
 
     Scaffold(
         topBar = {
@@ -95,27 +107,107 @@ fun NotoView(
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
             ) {
+
                 Text("created at ${state.noto.dateCreated.date}")
-                TextField(
-                    value = state.noto.title,
-                    onValueChange = {
-                        viewModel.handleTitleChange(it)
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    textStyle = TextStyle(
-                        fontSize = 18.sp,
-                        color = color.text
-                    ),
-                    placeholder = {
-                        Text(
-                            text = "title",
-                            color = color.subtext
-                        )
-                    },
-                    colors = TextFieldDefaults.textFieldColors(
-                        containerColor = Color.Transparent
-                    )
-                )
+                Row {
+                    var addingCategory by remember {
+                        mutableStateOf(false)
+                    }
+                    var newCategory by remember {
+                        mutableStateOf("")
+                    }
+
+                    LazyRow(Modifier.fillMaxWidth()) {
+                        item {
+                            AnimatedContent(addingCategory) { adding ->
+                                if (adding) {
+                                    AnimatedHintTextField(
+                                        text = newCategory,
+                                        textChangeHandler = {
+                                            newCategory = it
+                                        },
+                                        hint = "category",
+                                        modifier = Modifier.padding(start = 4.dp).fillMaxWidth(0.5f)
+                                    )
+                                } else {
+                                    TextField(
+                                        value = state.noto.title,
+                                        onValueChange = {
+                                            viewModel.handleTitleChange(it)
+                                        },
+                                        modifier = Modifier.fillMaxWidth(0.7f),
+                                        textStyle = TextStyle(
+                                            fontSize = 18.sp,
+                                            color = color.text,
+                                        ),
+                                        maxLines = 2,
+                                        placeholder = {
+                                            Text(
+                                                text = "title",
+                                                color = color.subtext
+                                            )
+                                        },
+                                        colors = TextFieldDefaults.textFieldColors(
+                                            containerColor = Color.Transparent
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                        item {
+                            Crossfade(targetState = addingCategory) { adding ->
+                                if (adding) {
+                                    Row {
+                                        IconButton(onClick = {
+                                            viewModel.handleCategoryChange(newCategory, true)
+                                            addingCategory = !addingCategory
+                                        }) {
+                                            Icon(
+                                                imageVector = Icons.Default.Check,
+                                                contentDescription = "confirm",
+                                                tint = color.primary
+                                            )
+                                        }
+                                        IconButton(onClick = {
+                                            addingCategory = !addingCategory
+                                        }) {
+                                            Icon(
+                                                imageVector = Icons.Default.ArrowForward,
+                                                contentDescription = "cancel",
+                                                tint = color.primary
+                                            )
+                                        }
+                                    }
+                                } else {
+                                    IconButton(onClick = { addingCategory = !addingCategory }) {
+                                        Icon(
+                                            imageVector = Icons.Default.Add,
+                                            contentDescription = "add",
+                                            tint = color.primary
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        items(state.categoryList) {
+                            val categorySelected by remember {
+                                derivedStateOf { it in state.noto.category }
+                            }
+                            FilterChip(
+                                selected = categorySelected,
+                                onClick = {
+                                    viewModel.handleCategoryChange(
+                                        category = it,
+                                        selected = !categorySelected
+                                    )
+                                },
+                                label = {
+                                    Text(it)
+                                }
+                            )
+                        }
+                    }
+                }
                 Column(
                     Modifier
                         .fillMaxSize()

@@ -156,19 +156,21 @@ fun UserSettingsScreen(
                             hint = "Enter your email",
                             text = state.username,
                             error = state.error,
-                        ) { text ->
-                            viewModel.usernameTextHandler(text)
-                        }
+                            textChangeHandler = { text ->
+                                viewModel.usernameTextHandler(text)
+                            }
+                        )
                         AnimatedHintTextField(
                             Modifier
                                 .fillMaxWidth()
                                 .padding(end = 12.dp),
                             hint = "Enter your password",
                             text = state.password,
-                            error = state.error
-                        ) { text ->
-                            viewModel.passwordTextHandler(text)
-                        }
+                            error = state.error,
+                            textChangeHandler = { text ->
+                                viewModel.passwordTextHandler(text)
+                            }
+                        )
                     }
                     Spacer(modifier = Modifier.height(20.dp))
                     AnimatedVisibility(visible = state.errorMessage.isNotEmpty()) {

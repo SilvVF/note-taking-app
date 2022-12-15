@@ -7,6 +7,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -25,6 +26,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -38,7 +41,9 @@ fun AnimatedHintTextField(
     error: Boolean = false,
     fontSize: Int = 16,
     boxHeight: Dp = 50.dp,
-    textChangeHandler: (String) -> Unit
+    icon: ImageVector = Icons.Default.Clear,
+    textChangeHandler: (String) -> Unit,
+    onIconClick: () -> Unit = { textChangeHandler("") }
 ) {
 
     val focusRequester = remember { FocusRequester() }
@@ -53,7 +58,7 @@ fun AnimatedHintTextField(
     ).value
 
     Box(
-        modifier.clickable {
+        modifier.clickable(remember { MutableInteractionSource() }, null, role = Role.Button) {
             focusRequester.requestFocus()
         },
         contentAlignment = Alignment.Center
@@ -122,9 +127,9 @@ fun AnimatedHintTextField(
                 .align(Alignment.CenterEnd)
         ) {
             IconButton(onClick = {
-                textChangeHandler("")
+                onIconClick()
             }) {
-                Icon(imageVector = Icons.Filled.Clear, contentDescription = "clear")
+                Icon(imageVector = icon, contentDescription = "clear")
             }
         }
     }

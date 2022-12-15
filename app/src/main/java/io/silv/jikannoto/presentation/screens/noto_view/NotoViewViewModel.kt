@@ -5,20 +5,36 @@ import androidx.lifecycle.ViewModel
 import io.silv.jikannoto.data.NotoRepositoryImpl
 import io.silv.jikannoto.domain.models.NotoItem
 import java.time.ZoneOffset
-import java.util.*
 import javax.annotation.concurrent.Immutable
 import kotlinx.datetime.toJavaLocalDateTime
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
+import org.orbitmvi.orbit.syntax.simple.repeatOnSubscription
 import org.orbitmvi.orbit.viewmodel.container
 
 class NotoViewViewModel(
     private val notoRepo: NotoRepositoryImpl
 ) : ViewModel(), ContainerHost<NotoViewState, NotoViewSideEffect> {
 
-    override val container = container<NotoViewState, NotoViewSideEffect>(NotoViewState())
+    override val container = container<NotoViewState, NotoViewSideEffect>(NotoViewState()) {
+        init()
+    }
+    private fun init() = intent {
+        repeatOnSubscription {
+            notoRepo.localNotoFlow.collect {
+                val uniqueCategorys = buildSet {
+                    it.onEach { notoItem ->
+                        notoItem.category.forEach { cat ->
+                            add(cat.trim())
+                        }
+                    }
+                }
+                reduce { state.copy(categoryList = uniqueCategorys.toList()) }
+            }
+        }
+    }
 
     fun initialNotoItem(noto: NotoItem?) = intent {
         noto?.let {
@@ -54,13 +70,24 @@ class NotoViewViewModel(
         }
     }
 
-    fun handleCategoryChange(category: String) = intent {
+    fun handleCategoryChange(category: String, selected: Boolean) = intent {
         reduce {
             state.copy(
                 noto = state.noto.copy(
-                    category = listOf(category)
+                    category = if (selected) {
+                        state.noto.category + category
+                    } else {
+                        state.noto.category.filter { it != category }
+                    }
                 )
             )
+        }
+        if (category !in state.categoryList) {
+            reduce {
+                state.copy(
+                    categoryList = state.categoryList + category
+                )
+            }
         }
     }
 }
@@ -68,7 +95,8 @@ class NotoViewViewModel(
 @Immutable
 @Stable
 data class NotoViewState(
-    val noto: NotoItem = NotoItem.blankItem()
+    val noto: NotoItem = NotoItem.blankItem(),
+    val categoryList: List<String> = emptyList(),
 )
 
 sealed class NotoViewSideEffect {
