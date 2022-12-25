@@ -1,6 +1,5 @@
 package io.silv.jikannoto.presentation.components
 
-import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -27,21 +26,11 @@ fun DrawerContentNav(
     onToggleDarkTheme: () -> Unit,
     navigate: (Screens) -> Unit
 ) {
-    val offset = remember {
-        Animatable(0f)
-    }
-
-    LaunchedEffect(key1 = drawerState.targetValue) {
-        if (drawerState.targetValue == DrawerValue.Closed) {
-            offset.animateTo(450f)
-        } else offset.snapTo(0f)
-    }
 
     ModalDrawerSheet(
         modifier = Modifier
             .fillMaxWidth(0.7f)
-            .fillMaxHeight()
-            .offset(x = -(offset.value.dp)),
+            .fillMaxHeight(),
         drawerContainerColor = LocalCustomTheme.current.drawer
     ) {
         val spacing = LocalSpacing.current

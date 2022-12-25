@@ -49,16 +49,16 @@ data class Light(
 data class Dark(
     override val primary: Color = Color(0xff2185d0),
     override val drawer: Color = Color(0xFF001D35),
-    override val headerBar: Color = Slate40,
-    override val text: Color = Slate00,
-    override val subtext: Color = Slate100,
-    override val surface: Color = Slate30,
-    override val background: Color = Slate900,
-    override val error: Color = Color(0xFF99080F),
-    override val bottomSheet: Color = Slate30,
-    override val notoListBackGround: Color = Color.White,
-    override val userSettingsBackGround: Color = Color.White,
-    override val notoViewBackground: Color = Color.White
+    override val text: Color = Color(0xfff8fafc),
+    override val subtext: Color = Color(0xffcbd5e1),
+    override val headerBar: Color = Color(0xff475569),
+    override val surface: Color = Color(0xff1f2937),
+    override val background: Color = Color(0xff1e293b),
+    override val error: Color = Color(0xffe11d48),
+    override val bottomSheet: Color = drawer,
+    override val notoListBackGround: Color = Color(0xff0f172a),
+    override val userSettingsBackGround: Color = Color(0xff0f172a),
+    override val notoViewBackground: Color = Color(0xff0f172a)
 ) : CustomTheme
 
 val LocalCustomTheme = compositionLocalOf<CustomTheme> { Light() }
@@ -143,7 +143,8 @@ fun JikanNotoTheme(
         else -> LightColors
     }
     CompositionLocalProvider(
-        LocalSpacing provides Spacing(), LocalCustomTheme providesDefault Light()
+        LocalSpacing provides Spacing(),
+        LocalCustomTheme provides if (darkTheme) Dark() else Light()
     ) {
         MaterialTheme(
             colorScheme = colorScheme,

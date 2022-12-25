@@ -1,5 +1,4 @@
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -113,12 +112,12 @@ fun UserSettingsScreen(
                     }
                 }
             },
+            sheetBackgroundColor = LocalCustomTheme.current.drawer,
             sheetContent = {
                 Column(
                     Modifier
                         .fillMaxHeight(0.8f)
                         .fillMaxWidth()
-                        .background(LocalCustomTheme.current.bottomSheet)
                         .padding(top = 16.dp, start = 12.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
