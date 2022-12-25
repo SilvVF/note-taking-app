@@ -1,3 +1,5 @@
+@file:OptIn(OrbitExperimental::class)
+
 package io.silv.jikannoto.presentation.screens.user_settings
 
 import androidx.lifecycle.ViewModel
@@ -8,6 +10,8 @@ import io.silv.jikannoto.domain.result.onSuccess
 import io.silv.jikannoto.presentation.navigation.Screens
 import kotlinx.coroutines.flow.first
 import org.orbitmvi.orbit.ContainerHost
+import org.orbitmvi.orbit.annotation.OrbitExperimental
+import org.orbitmvi.orbit.syntax.simple.blockingIntent
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
@@ -42,20 +46,21 @@ class UserSettingsViewModel(
             )
         }
     }
-    fun usernameTextHandler(username: String) = intent(false) {
+
+    fun usernameTextHandler(username: String) = blockingIntent {
         reduce { state.copy(username = username) }
     }
-    fun passwordTextHandler(password: String) = intent {
+    fun passwordTextHandler(password: String) = blockingIntent {
         reduce { state.copy(password = password) }
     }
 
-    fun changeFirstName(firstName: String) = intent {
+    fun changeFirstName(firstName: String) = blockingIntent {
         reduce {
             state.copy(
                 settings = state.settings.copy(firstName = firstName)
             )
         }
-        appDataStoreRepository.setFirstName(firstName)
+        intent { appDataStoreRepository.setFirstName(firstName) }
     }
     fun changeLastName(lastName: String) = intent {
         reduce {
@@ -63,7 +68,7 @@ class UserSettingsViewModel(
                 settings = state.settings.copy(lastName = lastName)
             )
         }
-        appDataStoreRepository.setLastName(lastName)
+        intent { appDataStoreRepository.setLastName(lastName) }
     }
 
     fun authenticate(username: String, password: String) = intent {

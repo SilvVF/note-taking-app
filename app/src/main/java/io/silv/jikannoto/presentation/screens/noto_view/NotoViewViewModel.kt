@@ -1,3 +1,5 @@
+@file:OptIn(OrbitExperimental::class)
+
 package io.silv.jikannoto.presentation.screens.noto_view
 
 import androidx.compose.runtime.Stable
@@ -8,10 +10,8 @@ import java.time.ZoneOffset
 import javax.annotation.concurrent.Immutable
 import kotlinx.datetime.toJavaLocalDateTime
 import org.orbitmvi.orbit.ContainerHost
-import org.orbitmvi.orbit.syntax.simple.intent
-import org.orbitmvi.orbit.syntax.simple.postSideEffect
-import org.orbitmvi.orbit.syntax.simple.reduce
-import org.orbitmvi.orbit.syntax.simple.repeatOnSubscription
+import org.orbitmvi.orbit.annotation.OrbitExperimental
+import org.orbitmvi.orbit.syntax.simple.*
 import org.orbitmvi.orbit.viewmodel.container
 
 class NotoViewViewModel(
@@ -24,14 +24,14 @@ class NotoViewViewModel(
     private fun init() = intent {
         repeatOnSubscription {
             notoRepo.localNotoFlow.collect {
-                val uniqueCategorys = buildSet {
+                val uniqueCategory = buildSet {
                     it.onEach { notoItem ->
                         notoItem.category.forEach { cat ->
                             add(cat.trim())
                         }
                     }
                 }
-                reduce { state.copy(categoryList = uniqueCategorys.toList()) }
+                reduce { state.copy(categoryList = uniqueCategory.toList()) }
             }
         }
     }
@@ -54,7 +54,8 @@ class NotoViewViewModel(
         )
         postSideEffect(NotoViewSideEffect.NotoSaved)
     }
-    fun handleTitleChange(title: String) = intent {
+
+    fun handleTitleChange(title: String) = blockingIntent {
         reduce {
             state.copy(
                 noto = state.noto.copy(title = title)
@@ -62,7 +63,7 @@ class NotoViewViewModel(
         }
     }
 
-    fun handleContentChange(content: String) = intent {
+    fun handleContentChange(content: String) = blockingIntent {
         reduce {
             state.copy(
                 noto = state.noto.copy(content = content)

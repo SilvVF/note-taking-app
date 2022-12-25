@@ -2,14 +2,14 @@ package io.silv.jikannoto.data.mocks
 
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import io.silv.jikannoto.data.local.NotoLocalDataSource
+import java.util.UUID
 import jikannoto.notodb.NotoEntity
+import kotlin.random.Random
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.datetime.Clock
-import java.util.UUID
-import kotlin.random.Random
 
-class FakeLocalDataSource: NotoLocalDataSource {
+class FakeLocalDataSource : NotoLocalDataSource {
 
     private var notoList = (0..100).map {
         NotoEntity(
