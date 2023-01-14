@@ -49,7 +49,7 @@ class NotoViewViewModel(
             id = noto.id,
             title = noto.title,
             content = noto.content,
-            category = noto.category.toString().removeSurrounding(prefix = "[", suffix = "]"),
+            category = noto.category.toString().removeSurrounding(prefix = "[", suffix = "]").trim(),
             dateCreated = noto.dateCreated.toJavaLocalDateTime().toEpochSecond(ZoneOffset.UTC) * 1000
         )
         postSideEffect(NotoViewSideEffect.NotoSaved)
@@ -72,10 +72,12 @@ class NotoViewViewModel(
     }
 
     fun handleCategoryChange(category: String, selected: Boolean) = intent {
+        val category = category.trim()
         reduce {
             state.copy(
                 noto = state.noto.copy(
-                    category = if (selected) {
+                    // Select and unselect by name if not wanted move && ...
+                    category = if (selected && category !in state.noto.category) {
                         state.noto.category + category
                     } else {
                         state.noto.category.filter { it != category }

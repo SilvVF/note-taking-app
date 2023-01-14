@@ -42,5 +42,6 @@ fun NotoEntity.toDomain(): NotoItem {
 
 fun String.toCategoryList(): List<String> =
     this.split(",")
+        .map { it.trim() }
         .filter { it.isNotBlank() }
         .ifEmpty { listOf("all") }
