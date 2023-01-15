@@ -63,7 +63,7 @@ class MainActivityViewModel(
                     Screens.UserSettings.route -> Screens.UserSettings
                     Screens.CheckList.route -> Screens.CheckList
                     Screens.Noto.route -> Screens.Noto
-                    else -> Screens.UserSettings
+                    else -> Screens.CheckList
                 }
             )
         }
@@ -71,8 +71,8 @@ class MainActivityViewModel(
 
     val navigationItems = listOf(
         NavItem(icon = Icons.Default.CheckCircle, name = "Checklist", route = Screens.CheckList, i = 0),
-        NavItem(painter = R.drawable.account_circle_48px, name = "User Settings", route = Screens.UserSettings, i = 1),
-        NavItem(painter = R.drawable.inventory_2_48px, name = "Notos", route = Screens.Noto, i = 2),
+        NavItem(painter = R.drawable.inventory_2_48px, name = "Notos", route = Screens.Noto, i = 1),
+        NavItem(painter = R.drawable.account_circle_48px, name = "User Settings", route = Screens.UserSettings, i = 2),
     )
 }
 

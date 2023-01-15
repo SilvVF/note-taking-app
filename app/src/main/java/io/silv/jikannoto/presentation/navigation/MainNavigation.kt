@@ -21,14 +21,13 @@ import java.util.*
 @Composable
 fun MainNavigation(
     navController: NavHostController,
-    startDest: Screens,
     authed: Boolean,
     showToast: (String) -> Unit,
     onMenuClicked: () -> Unit
 ) {
     NavHost(
         navController = navController,
-        startDestination = startDest.route
+        startDestination = Screens.CheckList.route
     ) {
         composable(
             route = Screens.CheckList.route

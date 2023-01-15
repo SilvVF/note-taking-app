@@ -104,7 +104,7 @@ fun AnimatedLoginHeader(
                         imageVector = if (expanded) Icons.Outlined.Settings
                         else Icons.Outlined.KeyboardArrowUp,
                         contentDescription = null,
-                        tint = Color.Black,
+                        tint = LocalCustomTheme.current.text,
                         modifier = Modifier.align(Alignment.TopEnd)
                     )
                 }

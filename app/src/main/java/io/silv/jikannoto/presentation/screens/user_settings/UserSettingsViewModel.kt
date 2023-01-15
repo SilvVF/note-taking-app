@@ -4,7 +4,8 @@ package io.silv.jikannoto.presentation.screens.user_settings
 
 import androidx.lifecycle.ViewModel
 import io.silv.jikannoto.data.AppDataStoreRepository
-import io.silv.jikannoto.domain.UserRepository
+import io.silv.jikannoto.data.remote.UserRepository
+import io.silv.jikannoto.domain.models.User
 import io.silv.jikannoto.domain.result.onException
 import io.silv.jikannoto.domain.result.onSuccess
 import io.silv.jikannoto.presentation.navigation.Screens
@@ -25,19 +26,28 @@ class UserSettingsViewModel(
     override val container = container<UserSettingsState, UserSettingsScreenEffect>(UserSettingsState()) {
         intent {
             val initial = appDataStoreRepository.collectAllFlow.first()
+            val user = userRepository.getUserInfo()
             reduce {
                 state.copy(
+                    currentUser = user,
                     settings = Settings(
                         darkTheme = initial.darkTheme,
                         firstName = initial.firstname,
                         lastName = initial.lastName,
-                        alwaysSync = false
+                        alwaysSync = initial.sync
                     )
                 )
             }
         }
     }
 
+    fun sendPasswordReset(email: String) = intent {
+        userRepository.sendPasswordReset(email).onSuccess {
+            postSideEffect(UserSettingsScreenEffect.PasswordResetSuccess)
+        }.onException {
+            postSideEffect(UserSettingsScreenEffect.PasswordResetError(it))
+        }
+    }
     fun changeDarkTheme(darkTheme: Boolean) = intent {
         appDataStoreRepository.setDarkTheme(!darkTheme)
         reduce {
@@ -54,6 +64,9 @@ class UserSettingsViewModel(
         reduce { state.copy(password = password) }
     }
 
+    fun resetEmailChangeHandler(email: String) = blockingIntent {
+        reduce { state.copy(resetEmail = email) }
+    }
     fun changeFirstName(firstName: String) = blockingIntent {
         reduce {
             state.copy(
@@ -71,6 +84,14 @@ class UserSettingsViewModel(
         intent { appDataStoreRepository.setLastName(lastName) }
     }
 
+    fun toggleSync(sync: Boolean) = intent {
+        appDataStoreRepository.setSync(sync)
+        reduce {
+            state.copy(
+                settings = state.settings.copy(alwaysSync = sync)
+            )
+        }
+    }
     fun authenticate(username: String, password: String) = intent {
         reduce { state.copy(authInProgress = true) }
         userRepository.login(username, password)
@@ -93,7 +114,9 @@ data class UserSettingsState(
     val error: Boolean = false,
     val authInProgress: Boolean = false,
     val errorMessage: String = "",
-    val settings: Settings = Settings()
+    val resetEmail: String = "",
+    val settings: Settings = Settings(),
+    val currentUser: User = User()
 )
 
 data class Settings(
@@ -105,4 +128,6 @@ data class Settings(
 
 sealed class UserSettingsScreenEffect {
     data class Navigate(val route: Screens) : UserSettingsScreenEffect()
+    data class PasswordResetError(val e: String) : UserSettingsScreenEffect()
+    object PasswordResetSuccess : UserSettingsScreenEffect()
 }

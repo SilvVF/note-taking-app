@@ -17,13 +17,14 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
 import io.silv.jikannoto.R
+import io.silv.jikannoto.ui.theme.LocalCustomTheme
 
 @Composable
 fun SettingToggle(
     modifier: Modifier = Modifier,
     setting: String,
     toggled: Boolean,
-    textColor: Color = Color.DarkGray,
+    textColor: Color = LocalCustomTheme.current.subtext,
     onToggle: () -> Unit
 ) {
     val animationProgress by animateFloatAsState(

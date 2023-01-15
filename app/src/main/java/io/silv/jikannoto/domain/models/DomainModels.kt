@@ -32,9 +32,7 @@ data class CheckListItem(
 )
 
 data class User(
-    val firstName: String = "",
-    val lastName: String = "",
-    val profilePictureUrl: String? = null
+    val email: String = "",
 )
 
 sealed class Priority(val value: Int) {

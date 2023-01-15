@@ -12,9 +12,9 @@ import io.silv.jikannoto.data.local.NotoLocalDataSource
 import io.silv.jikannoto.data.local.NotoLocalDataSourceImpl
 import io.silv.jikannoto.data.remote.NotoRemoteDataSource
 import io.silv.jikannoto.data.remote.NotoRemoteDataSourceImpl
+import io.silv.jikannoto.data.remote.UserRepository
 import io.silv.jikannoto.data.remote.UserRepositoryImpl
 import io.silv.jikannoto.data.util.NotoDispatchers
-import io.silv.jikannoto.domain.UserRepository
 import io.silv.jikannoto.presentation.screens.home.CheckListViewModel
 import io.silv.jikannoto.presentation.screens.noto_list.NotoListViewModel
 import io.silv.jikannoto.presentation.screens.noto_view.NotoViewViewModel
@@ -78,7 +78,7 @@ val appModule = module {
         )
     }
     single {
-        NotoRepositoryImpl(get(), get(), get(), get())
+        NotoRepositoryImpl(get(), get(), get(), get(), get())
     }
 
     single<NotoDispatchers> {

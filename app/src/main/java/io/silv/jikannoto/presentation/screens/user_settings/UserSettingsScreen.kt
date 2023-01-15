@@ -1,3 +1,4 @@
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -11,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -38,10 +40,13 @@ fun UserSettingsScreen(
 ) {
 
     val state = viewModel.collectAsState().value
+    val ctx = LocalContext.current
 
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
             is UserSettingsScreenEffect.Navigate -> onNavigate(sideEffect.route)
+            is UserSettingsScreenEffect.PasswordResetError -> Toast.makeText(ctx, sideEffect.e, Toast.LENGTH_SHORT).show()
+            UserSettingsScreenEffect.PasswordResetSuccess -> Toast.makeText(ctx, "sent successfully", Toast.LENGTH_SHORT).show()
         }
     }
     val scaffoldState = rememberBottomSheetScaffoldState()
@@ -75,6 +80,11 @@ fun UserSettingsScreen(
                             color = LocalCustomTheme.current.text
                         )
                         Spacer(modifier = Modifier.height(22.dp))
+                        Text(
+                            text = "current signed in user ${state.currentUser.email.ifBlank { "No one is signed in" }}",
+                            color = LocalCustomTheme.current.subtext,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
                         SettingToggle(
                             setting = "use dark theme",
                             toggled = state.settings.darkTheme,
@@ -89,6 +99,7 @@ fun UserSettingsScreen(
                             setting = "sync notos offline",
                             toggled = state.settings.alwaysSync,
                             onToggle = {
+                                viewModel.toggleSync(!state.settings.alwaysSync)
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -109,6 +120,21 @@ fun UserSettingsScreen(
                                 viewModel.changeLastName(it)
                             }
                         )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            AnimatedHintTextField(
+                                text = state.resetEmail,
+                                textChangeHandler = { viewModel.resetEmailChangeHandler(it) },
+                                hint = "reset password email",
+                                modifier = Modifier.fillMaxWidth(0.6f).padding(top = 16.dp, end = 8.dp)
+                            )
+                            AnimatedButton(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(30.dp),
+                                label = "send password reset",
+                                onClick = { viewModel.sendPasswordReset(state.resetEmail) }
+                            )
+                        }
                     }
                 }
             },
@@ -180,7 +206,9 @@ fun UserSettingsScreen(
                         )
                     }
                     AnimatedButton(
-                        modifier = Modifier.fillMaxWidth(0.7f).height(35.dp),
+                        modifier = Modifier
+                            .fillMaxWidth(0.7f)
+                            .height(35.dp),
                         fontSize = 18f,
                         enabled = !state.authInProgress,
                         label = "continue",

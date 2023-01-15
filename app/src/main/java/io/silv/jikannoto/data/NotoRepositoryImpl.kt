@@ -23,6 +23,7 @@ class NotoRepositoryImpl(
     private val localDataSource: NotoLocalDataSource,
     private val remoteDataSource: NotoRemoteDataSource,
     private val firebaseAuth: FirebaseAuth,
+    private val appDataStoreRepository: AppDataStoreRepository,
     private val dispatcher: NotoDispatchers
 ) {
     val localNotoFlow = localDataSource.getAllNotos().map {
@@ -38,7 +39,9 @@ class NotoRepositoryImpl(
             firebaseAuth.ifValidEmail(default = NotoFetchResult.Empty()) { email ->
                 remoteDataSource.fetchAllNotos(email)
             }.onSuccess { data ->
-                syncNotosFromNetwork(data)
+                if (appDataStoreRepository.collectAllFlow.first().sync) {
+                    syncNotosFromNetwork(data)
+                }
             }
         }
         emit(localDataSource.getAllNotos().first().map { it.toDomain() })

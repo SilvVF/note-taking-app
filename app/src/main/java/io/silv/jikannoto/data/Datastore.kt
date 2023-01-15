@@ -50,6 +50,14 @@ class AppDataStoreRepository(
         }
     }
 
+    fun setSync(
+        sync: Boolean
+    ) = CoroutineScope(dispatchers.io).launch {
+        context.dataStore.edit {
+            it[syncKey] = sync
+        }
+    }
+
     val darkThemeFlow: Flow<Boolean> = context.dataStore.data
         .map { preferences ->
             preferences[darkThemeKey] ?: false

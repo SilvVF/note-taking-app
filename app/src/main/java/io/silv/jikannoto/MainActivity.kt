@@ -19,7 +19,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import io.silv.jikannoto.presentation.components.DrawerContentNav
 import io.silv.jikannoto.presentation.navigation.MainNavigation
-import io.silv.jikannoto.presentation.navigation.Screens
 import io.silv.jikannoto.ui.theme.JikanNotoTheme
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -78,7 +77,8 @@ class MainActivity : ComponentActivity() {
                     drawerState = drawerState,
                     content = {
                         MainNavigation(
-                            navHostController, Screens.UserSettings, state.authed,
+                            navHostController,
+                            state.authed,
                             onMenuClicked = {
                                 coroutine.launch {
                                     drawerState.open()
