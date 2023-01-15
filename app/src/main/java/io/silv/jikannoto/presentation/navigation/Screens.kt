@@ -1,9 +1,8 @@
 package io.silv.jikannoto.presentation.navigation
 
 sealed class Screens(val route: String) {
-    object Home : Screens("Home")
-    object UserSettings : Screens("Auth")
+    object Noto : Screens("Noto")
+    object UserSettings : Screens("UserSettings")
 
-    object CheckList : Screens("Auth")
-    object OnBoarding : Screens("On_Boarding")
+    object CheckList : Screens("CheckList")
 }

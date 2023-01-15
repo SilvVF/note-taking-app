@@ -12,6 +12,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import io.silv.jikannoto.domain.models.NotoItem
+import io.silv.jikannoto.presentation.screens.home.CheckListScreen
 import io.silv.jikannoto.presentation.screens.noto_list.NotoListScreen
 import io.silv.jikannoto.presentation.screens.noto_view.NotoView
 import java.util.*
@@ -30,6 +31,11 @@ fun MainNavigation(
         startDestination = startDest.route
     ) {
         composable(
+            route = Screens.CheckList.route
+        ) {
+            CheckListScreen()
+        }
+        composable(
             route = Screens.UserSettings.route
         ) {
             UserSettingsScreen(authed) { navTarget ->
@@ -37,7 +43,7 @@ fun MainNavigation(
             }
         }
         composable(
-            route = Screens.Home.route
+            route = Screens.Noto.route
         ) {
             val (currentScreen, setCurrentScreen) = rememberSaveable {
                 mutableStateOf(1)

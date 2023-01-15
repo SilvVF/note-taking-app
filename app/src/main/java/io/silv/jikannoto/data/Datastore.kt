@@ -31,6 +31,10 @@ class AppDataStoreRepository(
             preferences[lastNameKey] ?: ""
         }.flowOn(dispatchers.io)
 
+    private val syncFlow: Flow<Boolean> = context.dataStore.data
+        .map { preferences ->
+            preferences[syncKey] ?: false
+        }.flowOn(dispatchers.io)
     fun setFirstName(
         firstname: String
     ) = CoroutineScope(dispatchers.io).launch {
@@ -63,22 +67,26 @@ class AppDataStoreRepository(
         combine(
             firstNameFlow,
             lastNameFlow,
-            darkThemeFlow
-        ) { firstName, lastName, darkTheme ->
+            darkThemeFlow,
+            syncFlow
+        ) { firstName, lastName, darkTheme, sync ->
             DataStoreState(
                 firstname = firstName,
                 lastName = lastName,
-                darkTheme = darkTheme
+                darkTheme = darkTheme,
+                sync = sync
             )
         }.flowOn(dispatchers.io)
     companion object {
         val firstNameKey = stringPreferencesKey("FIRST_NAME_KEY")
         val lastNameKey = stringPreferencesKey("LAST_NAME_KEY")
         val darkThemeKey = booleanPreferencesKey("DARK_THEME_KEY")
+        val syncKey = booleanPreferencesKey("SYNC_KEY")
     }
     data class DataStoreState(
         val firstname: String,
         val lastName: String,
         val darkTheme: Boolean,
+        val sync: Boolean = false
     )
 }

@@ -75,12 +75,12 @@ class UserSettingsViewModel(
         reduce { state.copy(authInProgress = true) }
         userRepository.login(username, password)
             .onSuccess {
-                postSideEffect(UserSettingsScreenEffect.Navigate(Screens.Home))
+                postSideEffect(UserSettingsScreenEffect.Navigate(Screens.CheckList))
             }
             .onException {
                 userRepository.register(username, password)
                     .onSuccess {
-                        postSideEffect(UserSettingsScreenEffect.Navigate(Screens.Home))
+                        postSideEffect(UserSettingsScreenEffect.Navigate(Screens.CheckList))
                     }
                 reduce { state.copy(error = true, errorMessage = it) }
             }

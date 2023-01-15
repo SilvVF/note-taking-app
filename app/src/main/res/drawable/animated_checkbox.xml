@@ -1,0 +1,74 @@
+<animated-vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt">
+    <aapt:attr name="android:drawable">
+        <vector
+            android:name="vector"
+            android:width="72dp"
+            android:height="67dp"
+            android:viewportWidth="72"
+            android:viewportHeight="67">
+            <group android:name="animatedcheckmark">
+                <path
+                    android:name="box"
+                    android:pathData="M 24 0.5 L 40 0.5 C 48.581 0.5 54.415 2.181 58.117 5.883 C 61.819 9.585 63.5 15.419 63.5 24 L 63.5 40 C 63.5 48.581 61.819 54.415 58.117 58.117 C 54.415 61.819 48.581 63.5 40 63.5 L 24 63.5 C 15.419 63.5 9.585 61.819 5.883 58.117 C 2.181 54.415 0.5 48.581 0.5 40 L 0.5 24 C 0.5 15.419 2.181 9.585 5.883 5.883 C 9.585 2.181 15.419 0.5 24 0.5 Z"
+                    android:fillColor="#538dd9"
+                    android:strokeColor="#538dd9"
+                    android:strokeWidth="4"
+                    android:strokeLineCap="round"
+                    android:strokeLineJoin="round"/>
+                <path
+                    android:name="checkoverflow"
+                    android:pathData="M 15 31.198 C 23.108 36.488 29.595 43 29.595 43 C 29.595 43 37.5 25.5 69 1.5"
+                    android:strokeColor="#538dd9"
+                    android:strokeWidth="9"
+                    android:trimPathEnd="0.95"
+                    android:strokeLineCap="round"
+                    android:strokeLineJoin="round"/>
+                <path
+                    android:name="checkmark"
+                    android:pathData="M 15 31.198 C 23.108 36.488 29.595 43 29.595 43 C 29.595 43 37.5 25.5 69 1.5"
+                    android:strokeColor="#ffffff"
+                    android:strokeWidth="9"
+                    android:trimPathEnd="0.83"
+                    android:strokeLineCap="round"
+                    android:strokeLineJoin="round"/>
+            </group>
+        </vector>
+    </aapt:attr>
+    <target android:name="box">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:propertyName="fillAlpha"
+                android:duration="200"
+                android:valueFrom="0"
+                android:valueTo="1"
+                android:valueType="floatType"
+                android:interpolator="@android:interpolator/fast_out_slow_in"/>
+        </aapt:attr>
+    </target>
+    <target android:name="checkoverflow">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:propertyName="trimPathEnd"
+                android:startOffset="50"
+                android:duration="150"
+                android:valueFrom="0"
+                android:valueTo="0.94"
+                android:valueType="floatType"
+                android:interpolator="@android:anim/accelerate_interpolator"/>
+        </aapt:attr>
+    </target>
+    <target android:name="checkmark">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:propertyName="trimPathEnd"
+                android:startOffset="25"
+                android:duration="125"
+                android:valueFrom="0"
+                android:valueTo="0.815"
+                android:valueType="floatType"
+                android:interpolator="@android:anim/accelerate_interpolator"/>
+        </aapt:attr>
+    </target>
+</animated-vector>

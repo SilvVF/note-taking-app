@@ -60,7 +60,9 @@ class MainActivityViewModel(
         reduce {
             state.copy(
                 currScreens = when (sc) {
-                    Screens.Home.route -> Screens.Home
+                    Screens.UserSettings.route -> Screens.UserSettings
+                    Screens.CheckList.route -> Screens.CheckList
+                    Screens.Noto.route -> Screens.Noto
                     else -> Screens.UserSettings
                 }
             )
@@ -68,9 +70,9 @@ class MainActivityViewModel(
     }
 
     val navigationItems = listOf(
-        NavItem(painter = R.drawable.account_circle_48px, name = "User Settings", route = Screens.UserSettings, i = 0),
-        NavItem(painter = R.drawable.inventory_2_48px, name = "Notos", route = Screens.Home, i = 1),
-        NavItem(icon = Icons.Default.CheckCircle, name = "Checklist", route = Screens.CheckList, i = 2),
+        NavItem(icon = Icons.Default.CheckCircle, name = "Checklist", route = Screens.CheckList, i = 0),
+        NavItem(painter = R.drawable.account_circle_48px, name = "User Settings", route = Screens.UserSettings, i = 1),
+        NavItem(painter = R.drawable.inventory_2_48px, name = "Notos", route = Screens.Noto, i = 2),
     )
 }
 
@@ -79,7 +81,7 @@ data class AppState(
     val darkTheme: Boolean = false,
     val loading: Boolean = true,
     val username: Pair<String, String> = "" to "",
-    val currScreens: Screens = Screens.Home,
+    val currScreens: Screens = Screens.CheckList,
 )
 data class NavItem(
     @DrawableRes val painter: Int? = null,
