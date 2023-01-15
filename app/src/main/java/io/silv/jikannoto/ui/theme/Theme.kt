@@ -126,7 +126,10 @@ private val DarkColors = darkColorScheme(
     outlineVariant = md_theme_dark_outlineVariant,
     scrim = md_theme_dark_scrim,
 )
-
+data class Theme(
+    val dark: Boolean = true
+)
+val LocalTheme = compositionLocalOf { Theme(true) }
 @Composable
 fun JikanNotoTheme(
     darkTheme: Boolean,
@@ -144,7 +147,8 @@ fun JikanNotoTheme(
     }
     CompositionLocalProvider(
         LocalSpacing provides Spacing(),
-        LocalCustomTheme provides if (darkTheme) Dark() else Light()
+        LocalCustomTheme provides if (darkTheme) Dark() else Light(),
+        LocalTheme provides Theme(dark = darkTheme)
     ) {
         MaterialTheme(
             colorScheme = colorScheme,

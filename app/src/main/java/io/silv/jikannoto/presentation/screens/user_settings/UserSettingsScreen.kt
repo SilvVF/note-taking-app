@@ -66,6 +66,7 @@ fun UserSettingsScreen(
             sheetShape = RoundedCornerShape(30.dp),
             content = {
                 InteractionConsumingBox(
+                    modifier = Modifier.fillMaxSize(),
                     backgroundColor = LocalCustomTheme.current.userSettingsBackGround
                 ) {
                     Column(
@@ -141,7 +142,7 @@ fun UserSettingsScreen(
                             AnimatedButton(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(30.dp),
+                                    .height(30.dp).offset(y = (6).dp),
                                 label = "send password reset",
                                 onClick = { viewModel.sendPasswordReset(state.resetEmail) }
                             )
