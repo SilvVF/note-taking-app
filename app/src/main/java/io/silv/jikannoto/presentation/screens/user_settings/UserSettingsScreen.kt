@@ -47,6 +47,8 @@ fun UserSettingsScreen(
             is UserSettingsScreenEffect.Navigate -> onNavigate(sideEffect.route)
             is UserSettingsScreenEffect.PasswordResetError -> Toast.makeText(ctx, sideEffect.e, Toast.LENGTH_SHORT).show()
             UserSettingsScreenEffect.PasswordResetSuccess -> Toast.makeText(ctx, "sent successfully", Toast.LENGTH_SHORT).show()
+            UserSettingsScreenEffect.LogOutFailure -> Toast.makeText(ctx, "failed to sing out", Toast.LENGTH_SHORT).show()
+            UserSettingsScreenEffect.LogOutSuccess -> Toast.makeText(ctx, "signed out", Toast.LENGTH_SHORT).show()
         }
     }
     val scaffoldState = rememberBottomSheetScaffoldState()
@@ -80,11 +82,18 @@ fun UserSettingsScreen(
                             color = LocalCustomTheme.current.text
                         )
                         Spacer(modifier = Modifier.height(22.dp))
-                        Text(
-                            text = "current signed in user ${state.currentUser.email.ifBlank { "No one is signed in" }}",
-                            color = LocalCustomTheme.current.subtext,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
+                        Column(modifier = Modifier.padding(bottom = 8.dp)) {
+                            Text(
+                                text = "current signed in user ${state.currentUser.email.ifBlank { "No one is signed in" }}",
+                                color = LocalCustomTheme.current.subtext,
+                            )
+                            if (authed)
+                                Text(
+                                    text = "sign out",
+                                    color = LocalCustomTheme.current.primary,
+                                    modifier = Modifier.clickable { viewModel.logOut() }
+                                )
+                        }
                         SettingToggle(
                             setting = "use dark theme",
                             toggled = state.settings.darkTheme,
@@ -125,7 +134,9 @@ fun UserSettingsScreen(
                                 text = state.resetEmail,
                                 textChangeHandler = { viewModel.resetEmailChangeHandler(it) },
                                 hint = "reset password email",
-                                modifier = Modifier.fillMaxWidth(0.6f).padding(top = 16.dp, end = 8.dp)
+                                modifier = Modifier
+                                    .fillMaxWidth(0.6f)
+                                    .padding(top = 16.dp, end = 8.dp)
                             )
                             AnimatedButton(
                                 modifier = Modifier

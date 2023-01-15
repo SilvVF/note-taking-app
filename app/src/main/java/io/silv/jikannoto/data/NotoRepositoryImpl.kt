@@ -62,15 +62,20 @@ class NotoRepositoryImpl(
         category: String,
         dateCreated: Long = Clock.System.now().toEpochMilliseconds()
     ) = withContext(dispatcher.io) {
-        val (result, email) = firebaseAuth.ifValidEmail(NotoApiResult.Exception<Nothing>(null) to null) { email ->
-            remoteDataSource.upsertNoto(
-                NetworkNoto(id, dateCreated, title, content, email, category)
-            ) to email
+        var result: NotoApiResult<Nothing>? = null
+        var userEmail: String? = null
+        if (appDataStoreRepository.collectAllFlow.first().sync) {
+            firebaseAuth.ifValidEmail(NotoApiResult.Exception<Nothing>(null) to null) { email ->
+                result = remoteDataSource.upsertNoto(
+                    NetworkNoto(id, dateCreated, title, content, email, category)
+                )
+                userEmail = email
+            }
         }
         localDataSource.insertNoto(
             NotoEntity(
-                id, title, content, email ?: "", category,
-                synced = result is NotoApiResult.Success,
+                id, title, content, userEmail ?: "", category,
+                synced = result is NotoApiResult.Success<*>,
                 dateCreated = dateCreated,
                 lastSync = Clock.System.now().toEpochMilliseconds()
             )
@@ -80,10 +85,14 @@ class NotoRepositoryImpl(
     suspend fun deleteNoto(id: String) = withContext(dispatcher.io) {
         Log.d("notos", "repo deleteNoto invoked with id:$id")
         localDataSource.deleteNotoById(id)
-        remoteDataSource.deleteNoto(id)
-            .onException {
-                localDataSource.addLocallyDeleted(id)
-            }
+        if (appDataStoreRepository.collectAllFlow.first().sync) {
+            remoteDataSource.deleteNoto(id)
+                .onException {
+                    localDataSource.addLocallyDeleted(id)
+                }
+        } else {
+            localDataSource.addLocallyDeleted(id)
+        }
     }
 }
 

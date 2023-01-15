@@ -6,6 +6,8 @@ import io.silv.jikannoto.data.util.onNoExceptionThrown
 import io.silv.jikannoto.data.util.safeCall
 import io.silv.jikannoto.domain.models.User
 import io.silv.jikannoto.domain.result.NotoApiResult
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 class UserRepositoryImpl(
@@ -14,14 +16,20 @@ class UserRepositoryImpl(
 ) : UserRepository {
 
     override suspend fun sendPasswordReset(email: String): NotoApiResult<Nothing> = withContext(dispatcher.io) {
-        val res = runCatching {
+        runCatching {
             firebaseAuth.sendPasswordResetEmail(email)
         }.onSuccess {
             return@withContext NotoApiResult.Success<Nothing>()
         }
         NotoApiResult.Exception<Nothing>("failed to send")
     }
-    override suspend fun getUserInfo(): User = User(firebaseAuth.currentUser?.email ?: "not signed in")
+    override suspend fun currentUserInfo() = callbackFlow<User> {
+        val listener = FirebaseAuth.AuthStateListener {
+            trySend(User(it.currentUser?.email ?: ""))
+        }
+        firebaseAuth.addAuthStateListener(listener)
+        awaitClose { firebaseAuth.removeAuthStateListener(listener) }
+    }
     override suspend fun login(
         username: String,
         password: String
@@ -36,10 +44,7 @@ class UserRepositoryImpl(
         }
     }
 
-    override suspend fun logout(
-        username: String,
-        password: String
-    ): NotoApiResult<Nothing> = withContext(dispatcher.io) {
+    override suspend fun logout(): NotoApiResult<Nothing> = withContext(dispatcher.io) {
         safeCall {
             firebaseAuth.signOut()
             onNoExceptionThrown { NotoApiResult.Success() }

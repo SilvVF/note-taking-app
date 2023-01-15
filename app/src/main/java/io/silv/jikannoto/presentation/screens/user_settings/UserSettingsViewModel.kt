@@ -12,10 +12,7 @@ import io.silv.jikannoto.presentation.navigation.Screens
 import kotlinx.coroutines.flow.first
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.annotation.OrbitExperimental
-import org.orbitmvi.orbit.syntax.simple.blockingIntent
-import org.orbitmvi.orbit.syntax.simple.intent
-import org.orbitmvi.orbit.syntax.simple.postSideEffect
-import org.orbitmvi.orbit.syntax.simple.reduce
+import org.orbitmvi.orbit.syntax.simple.*
 import org.orbitmvi.orbit.viewmodel.container
 
 class UserSettingsViewModel(
@@ -26,10 +23,8 @@ class UserSettingsViewModel(
     override val container = container<UserSettingsState, UserSettingsScreenEffect>(UserSettingsState()) {
         intent {
             val initial = appDataStoreRepository.collectAllFlow.first()
-            val user = userRepository.getUserInfo()
             reduce {
                 state.copy(
-                    currentUser = user,
                     settings = Settings(
                         darkTheme = initial.darkTheme,
                         firstName = initial.firstname,
@@ -37,6 +32,11 @@ class UserSettingsViewModel(
                         alwaysSync = initial.sync
                     )
                 )
+            }
+            repeatOnSubscription {
+                userRepository.currentUserInfo().collect { user ->
+                    reduce { state.copy(currentUser = user) }
+                }
             }
         }
     }
@@ -107,6 +107,11 @@ class UserSettingsViewModel(
             }
         reduce { state.copy(authInProgress = false) }
     }
+
+    fun logOut() = intent {
+        userRepository.logout().onSuccess {
+        }
+    }
 }
 data class UserSettingsState(
     val username: String = "",
@@ -130,4 +135,7 @@ sealed class UserSettingsScreenEffect {
     data class Navigate(val route: Screens) : UserSettingsScreenEffect()
     data class PasswordResetError(val e: String) : UserSettingsScreenEffect()
     object PasswordResetSuccess : UserSettingsScreenEffect()
+
+    object LogOutSuccess : UserSettingsScreenEffect()
+    object LogOutFailure : UserSettingsScreenEffect()
 }
