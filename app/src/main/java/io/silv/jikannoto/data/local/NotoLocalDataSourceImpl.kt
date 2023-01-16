@@ -8,6 +8,7 @@ import io.silv.jikannoto.data.util.NotoDispatchers
 import jikannoto.notodb.NotoEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 
 class NotoLocalDataSourceImpl(
@@ -24,7 +25,7 @@ class NotoLocalDataSourceImpl(
     }
 
     override fun getAllNotos(): Flow<List<NotoEntity>> =
-        queries.getAllNotos().asFlow().mapToList()
+        queries.getAllNotos().asFlow().mapToList().flowOn(dispatcher.io)
 
     override suspend fun insertNoto(notoEntity: NotoEntity) {
         queries.upsertNoto(

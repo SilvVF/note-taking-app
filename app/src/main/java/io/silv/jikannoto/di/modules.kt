@@ -7,13 +7,13 @@ import com.squareup.sqldelight.android.AndroidSqliteDriver
 import io.silv.jikannoto.MainActivityViewModel
 import io.silv.jikannoto.NotoDatabase
 import io.silv.jikannoto.data.AppDataStoreRepository
+import io.silv.jikannoto.data.CheckListRepositoryImpl
 import io.silv.jikannoto.data.NotoRepositoryImpl
+import io.silv.jikannoto.data.local.CheckListLocalDataSource
+import io.silv.jikannoto.data.local.CheckListLocalDataSourceImpl
 import io.silv.jikannoto.data.local.NotoLocalDataSource
 import io.silv.jikannoto.data.local.NotoLocalDataSourceImpl
-import io.silv.jikannoto.data.remote.NotoRemoteDataSource
-import io.silv.jikannoto.data.remote.NotoRemoteDataSourceImpl
-import io.silv.jikannoto.data.remote.UserRepository
-import io.silv.jikannoto.data.remote.UserRepositoryImpl
+import io.silv.jikannoto.data.remote.*
 import io.silv.jikannoto.data.util.NotoDispatchers
 import io.silv.jikannoto.presentation.screens.check_list.CheckListViewModel
 import io.silv.jikannoto.presentation.screens.noto_list.NotoListViewModel
@@ -46,6 +46,10 @@ val appModule = module {
     factoryOf(::NotoRemoteDataSourceImpl) bind NotoRemoteDataSource::class
     factoryOf(::NotoLocalDataSourceImpl) bind NotoLocalDataSource::class
 
+    factoryOf(::CheckListRemoteDataSourceImpl) bind CheckListRemoteDataSource::class
+    factoryOf(::CheckListLocalDataSourceImpl) bind CheckListLocalDataSource::class
+
+    factoryOf(::CheckListRepositoryImpl)
     factoryOf(::NotoRepositoryImpl)
 
     viewModelOf(::UserSettingsViewModel)

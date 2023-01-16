@@ -23,7 +23,7 @@ data class NotoItem(
     }
 }
 data class CheckListItem(
-    val id: String,
+    val id: String = UUID.randomUUID().toString(),
     val dateCreated: LocalDateTime,
     val name: String,
     val completed: Boolean,

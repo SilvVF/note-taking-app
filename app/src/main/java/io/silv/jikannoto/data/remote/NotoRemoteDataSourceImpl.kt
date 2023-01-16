@@ -9,7 +9,6 @@ import io.silv.jikannoto.data.util.NotoDispatchers
 import io.silv.jikannoto.data.util.defaultEventHandles
 import io.silv.jikannoto.domain.result.NotoApiResult
 import io.silv.jikannoto.domain.result.NotoFetchResult
-import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -46,7 +45,6 @@ class NotoRemoteDataSourceImpl(
             )
     }
 
-    @OptIn(InternalCoroutinesApi::class)
     override suspend fun fetchAllNotos(owner: String) =
         withContext(dispatchers.io) {
             try {
@@ -66,20 +64,4 @@ class NotoRemoteDataSourceImpl(
                 NotoFetchResult.Empty()
             }
         }
-
-//    suspend fun uploadImage(
-//        user: String,
-//        imageUrl: String
-//    ) = withContext(dispatchers.io) {
-//        val result = firestore.collection(Collections.user)
-//            .whereEqualTo("user", user)
-//            .get()
-//            .await()
-//        result.documents.firstNotNullOf { document ->
-//            document.reference.update(
-//                /*field =*/ "profilePictureUrl",
-//                /*value =*/imageUrl
-//            )
-//        }
-//    }
 }

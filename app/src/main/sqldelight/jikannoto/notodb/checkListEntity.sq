@@ -18,6 +18,9 @@ removeLocallyDeletedCheckListEntity:
 DELETE FROM locallyDeletedCheckList
 WHERE id = :id;
 
+getAllLocallyDeletedCheckListIds:
+SELECT * FROM locallyDeletedCheckList;
+
 getAllCheckListEntitys:
 SELECT * FROM checkListEntity;
 

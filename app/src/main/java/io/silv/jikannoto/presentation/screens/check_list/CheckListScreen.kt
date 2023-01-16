@@ -10,10 +10,15 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -37,6 +42,7 @@ import io.silv.jikannoto.ui.theme.LocalSpacing
 import io.silv.jikannoto.ui.theme.LocalTheme
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.getViewModel
+import org.orbitmvi.orbit.compose.collectAsState
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -49,6 +55,7 @@ fun CheckListScreen(
 
     val colors = LocalCustomTheme.current
     val s = LocalSpacing.current
+    val state by viewModel.collectAsState()
 
     val koiTransition = rememberInfiniteTransition().animateFloat(
         initialValue = 0f,
@@ -108,10 +115,10 @@ fun CheckListScreen(
                     .padding(top = 16.dp)
             ) {
                 items(
-                    viewModel.checkListItems,
-                    key = { it }
+                    state.checkListItems,
+                    key = { it.id }
                 ) {
-                    var c by remember { mutableStateOf(false) }
+                    var c by remember { mutableStateOf(it.completed) }
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -121,7 +128,7 @@ fun CheckListScreen(
                     ) {
                         SwipeToDeleteLayout(
                             onDelete = {
-                                viewModel.checkListItems = viewModel.checkListItems.minusElement(it)
+                                viewModel.deleteCheckListItem(it.id)
                             },
                             onClick = { },
                         ) {
@@ -131,13 +138,20 @@ fun CheckListScreen(
                                     .height(35.dp)
                                     .background(colors.background)
                                     .padding(start = 20.dp),
-                                content = "jsfdfasfle $it",
+                                content = it.name,
                                 complete = c,
                                 onCompleteChanged = { c = it }
                             )
                         }
                     }
                     Spacer(modifier = Modifier.height(12.dp))
+                }
+                item {
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        IconButton(onClick = { viewModel.addCheckListItem("test adding item") }) {
+                            Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
+                        }
+                    }
                 }
             }
         }
@@ -168,7 +182,7 @@ fun AnimatedCheckListItem(
     }
 
     val colorTransition = remember {
-        androidx.compose.animation.Animatable(
+        Animatable(
             initialValue = color.text
         )
     }
@@ -200,7 +214,7 @@ fun AnimatedCheckListItem(
             painter = image,
             contentDescription = "completed",
             modifier = Modifier
-                .clickable {
+                .clickable(remember { MutableInteractionSource() }, null) {
                     onCompleteChanged(!complete)
                 }
         )
@@ -213,6 +227,7 @@ fun AnimatedCheckListItem(
             maxLines = 1,
             modifier = Modifier
                 .padding(start = textOffset.value.dp)
+                .offset(y = -(2).dp)
                 .drawWithContent {
                     drawContent()
                     drawLine(

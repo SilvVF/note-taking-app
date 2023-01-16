@@ -15,6 +15,7 @@ import io.silv.jikannoto.domain.result.onException
 import io.silv.jikannoto.domain.result.onSuccess
 import java.util.UUID
 import jikannoto.notodb.NotoEntity
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
@@ -52,6 +53,14 @@ class NotoRepositoryImpl(
             localDataSource.insertNoto(
                 networkNoto.toEntity()
             )
+        }
+        coroutineScope {
+            localDataSource.getAllLocallyDeletedIds().forEach {
+                remoteDataSource.deleteNoto(it)
+                    .onSuccess {
+                        localDataSource.handleLocallyDeleted(it)
+                    }
+            }
         }
     }
 
