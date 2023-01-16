@@ -22,64 +22,12 @@ import io.silv.jikannoto.presentation.screens.user_settings.UserSettingsViewMode
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.koin.androidContext
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.androidx.viewmodel.dsl.viewModelOf
+import org.koin.core.module.dsl.factoryOf
+import org.koin.dsl.bind
 import org.koin.dsl.module
 
 val appModule = module {
-
-    single {
-        Firebase.firestore
-    }
-    single {
-        FirebaseAuth.getInstance()
-    }
-    single {
-        AppDataStoreRepository(androidContext(), get())
-    }
-
-    viewModel {
-        MainActivityViewModel(
-            get(), get()
-        )
-    }
-    single<UserRepository> {
-        UserRepositoryImpl(
-            get(),
-            get()
-        )
-    }
-    viewModel {
-        UserSettingsViewModel(
-            get(),
-            get()
-        )
-    }
-
-    viewModel {
-        CheckListViewModel()
-    }
-
-    viewModel {
-        NotoListViewModel(get())
-    }
-    single<NotoLocalDataSource> {
-        NotoLocalDataSourceImpl(
-            NotoDatabase(
-                AndroidSqliteDriver(
-                    NotoDatabase.Schema, androidContext(), "noto.db"
-                )
-            ),
-            get()
-        )
-    }
-    single<NotoRemoteDataSource> {
-        NotoRemoteDataSourceImpl(
-            get(), get()
-        )
-    }
-    single {
-        NotoRepositoryImpl(get(), get(), get(), get(), get())
-    }
 
     single<NotoDispatchers> {
         object : NotoDispatchers {
@@ -93,10 +41,40 @@ val appModule = module {
                 get() = Dispatchers.Unconfined
         }
     }
-    viewModel {
-        NotoViewViewModel(get())
-    }
+
+    factoryOf(::UserRepositoryImpl) bind UserRepository::class
+    factoryOf(::NotoRemoteDataSourceImpl) bind NotoRemoteDataSource::class
+    factoryOf(::NotoLocalDataSourceImpl) bind NotoLocalDataSource::class
+
+    factoryOf(::NotoRepositoryImpl)
+
+
+    viewModelOf(::UserSettingsViewModel)
+    viewModelOf(::NotoListViewModel)
+    viewModelOf(::MainActivityViewModel)
+    viewModelOf(::NotoViewViewModel)
+    viewModelOf(::CheckListViewModel)
 }
 
-val authModule = module {
+val dataModule = module {
+
+    single {
+        AppDataStoreRepository(androidContext(), get())
+    }
+
+    single {
+        Firebase.firestore
+    }
+
+    single {
+        NotoDatabase(
+            AndroidSqliteDriver(
+                NotoDatabase.Schema, androidContext(), "noto.db"
+            )
+        )
+    }
+
+    single {
+        FirebaseAuth.getInstance()
+    }
 }
