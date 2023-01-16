@@ -25,30 +25,10 @@ data class NotoItem(
 data class CheckListItem(
     val id: String,
     val dateCreated: LocalDateTime,
-    val title: String,
-    val synced: Boolean,
+    val name: String,
     val completed: Boolean,
-    val priority: Priority
 )
 
 data class User(
     val email: String = "",
 )
-
-sealed class Priority(val value: Int) {
-
-    object High : Priority(1)
-    object Med : Priority(2)
-    object Low : Priority(3)
-
-    companion object {
-        fun fromNumber(i: Number): Priority {
-            return when (i) {
-                1 -> High
-                2 -> Med
-                3 -> Low
-                else -> Med
-            }
-        }
-    }
-}

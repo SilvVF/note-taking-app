@@ -1,7 +1,9 @@
 package io.silv.jikannoto.domain.mappers
 
 import io.silv.jikannoto.data.models.NetworkNoto
+import io.silv.jikannoto.domain.models.CheckListItem
 import io.silv.jikannoto.domain.models.NotoItem
+import jikannoto.notodb.CheckListEntity
 import jikannoto.notodb.NotoEntity
 import kotlinx.datetime.*
 
@@ -37,6 +39,15 @@ fun NotoEntity.toDomain(): NotoItem {
         content = content,
         category = category.toCategoryList(),
         synced = synced ?: false,
+    )
+}
+
+fun CheckListEntity.toDomain(): CheckListItem {
+    return CheckListItem(
+        id = id,
+        dateCreated = Instant.fromEpochMilliseconds(dateCreated).toLocalDateTime(TimeZone.UTC),
+        name = name,
+        completed = completed ?: false
     )
 }
 

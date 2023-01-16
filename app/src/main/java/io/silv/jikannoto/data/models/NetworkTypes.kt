@@ -14,14 +14,6 @@ data class NetworkNoto(
 data class NetworkChecklistItem(
     val id: String = UUID.randomUUID().toString(),
     val dateCreated: Long,
-    val title: String,
-    val synced: Boolean,
+    val name: String,
     val completed: Boolean,
-    val priority: Int
-)
-
-data class NetworkUser(
-    val email: String,
-    val password: String,
-    val id: String = UUID.randomUUID().toString()
 )

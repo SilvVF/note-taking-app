@@ -1,0 +1,39 @@
+CREATE TABLE checkListEntity (
+    id TEXT NOT NULL PRIMARY KEY,
+    dateCreated INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    completed INTEGER AS Boolean DEFAULT 0
+);
+
+CREATE TABLE locallyDeletedCheckList (
+    id TEXT NOT NULL PRIMARY KEY
+);
+
+addLocallyDeletedCheckListEntity:
+INSERT OR REPLACE
+INTO locallyDeletedCheckList
+VALUES (?);
+
+removeLocallyDeletedCheckListEntity:
+DELETE FROM locallyDeletedCheckList
+WHERE id = :id;
+
+getAllCheckListEntitys:
+SELECT * FROM checkListEntity;
+
+getCheckListEntityById:
+SELECT *
+FROM checkListEntity
+WHERE id = :id
+LIMIT 1;
+
+deleteCheckListEntityById:
+DELETE FROM checkListEntity
+WHERE id = :id;
+
+upsertCheckListEntity:
+INSERT OR REPLACE
+INTO checkListEntity
+VALUES (?, ?, ? ,?);
+
+
