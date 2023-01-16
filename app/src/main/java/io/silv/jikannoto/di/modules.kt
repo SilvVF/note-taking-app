@@ -15,7 +15,7 @@ import io.silv.jikannoto.data.remote.NotoRemoteDataSourceImpl
 import io.silv.jikannoto.data.remote.UserRepository
 import io.silv.jikannoto.data.remote.UserRepositoryImpl
 import io.silv.jikannoto.data.util.NotoDispatchers
-import io.silv.jikannoto.presentation.screens.home.CheckListViewModel
+import io.silv.jikannoto.presentation.screens.check_list.CheckListViewModel
 import io.silv.jikannoto.presentation.screens.noto_list.NotoListViewModel
 import io.silv.jikannoto.presentation.screens.noto_view.NotoViewViewModel
 import io.silv.jikannoto.presentation.screens.user_settings.UserSettingsViewModel
@@ -47,7 +47,6 @@ val appModule = module {
     factoryOf(::NotoLocalDataSourceImpl) bind NotoLocalDataSource::class
 
     factoryOf(::NotoRepositoryImpl)
-
 
     viewModelOf(::UserSettingsViewModel)
     viewModelOf(::NotoListViewModel)

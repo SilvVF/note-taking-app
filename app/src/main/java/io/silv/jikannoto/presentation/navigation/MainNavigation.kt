@@ -10,7 +10,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import io.silv.jikannoto.domain.models.NotoItem
-import io.silv.jikannoto.presentation.screens.home.CheckListScreen
+import io.silv.jikannoto.presentation.screens.check_list.CheckListScreen
 import io.silv.jikannoto.presentation.screens.noto_list.NotoListScreen
 import io.silv.jikannoto.presentation.screens.noto_view.NotoView
 import java.util.*
@@ -20,6 +20,7 @@ import java.util.*
 fun MainNavigation(
     navController: NavHostController,
     authed: Boolean,
+    name: String,
     showToast: (String) -> Unit,
     onMenuClicked: () -> Unit
 ) {
@@ -33,7 +34,10 @@ fun MainNavigation(
         composable(
             route = Screens.CheckList.route
         ) {
-            CheckListScreen(playAnimation = playAnimation) {
+            CheckListScreen(
+                playAnimation = playAnimation,
+                name = name
+            ) {
                 playAnimation = false
             }
         }

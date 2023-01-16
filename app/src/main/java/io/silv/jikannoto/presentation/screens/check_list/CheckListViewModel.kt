@@ -1,4 +1,4 @@
-package io.silv.jikannoto.presentation.screens.home
+package io.silv.jikannoto.presentation.screens.check_list
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

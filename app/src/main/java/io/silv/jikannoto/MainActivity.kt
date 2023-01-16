@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
 
-            val state = viewModel.collectAsState().value
+            val state by viewModel.collectAsState()
             val navHostController = rememberNavController()
             val destination = navHostController.currentBackStackEntryAsState().value?.destination?.route
             val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -77,8 +77,9 @@ class MainActivity : ComponentActivity() {
                     drawerState = drawerState,
                     content = {
                         MainNavigation(
-                            navHostController,
-                            state.authed,
+                            navController = navHostController,
+                            authed = state.authed,
+                            name = "${state.username.first} ${state.username.second}",
                             onMenuClicked = {
                                 coroutine.launch {
                                     drawerState.open()

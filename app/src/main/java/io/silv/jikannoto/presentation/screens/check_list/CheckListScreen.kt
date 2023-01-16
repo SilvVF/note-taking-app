@@ -1,6 +1,6 @@
-package io.silv.jikannoto.presentation.screens.home
+package io.silv.jikannoto.presentation.screens.check_list
 
-import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
@@ -23,7 +23,6 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,9 +31,11 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
 import io.silv.jikannoto.R
 import io.silv.jikannoto.presentation.atoms.SwipeToDeleteLayout
+import io.silv.jikannoto.presentation.components.SlideAwayWelcomePrompt
 import io.silv.jikannoto.ui.theme.LocalCustomTheme
 import io.silv.jikannoto.ui.theme.LocalSpacing
 import io.silv.jikannoto.ui.theme.LocalTheme
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.getViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -42,6 +43,7 @@ import org.koin.androidx.compose.getViewModel
 fun CheckListScreen(
     viewModel: CheckListViewModel = getViewModel(),
     playAnimation: Boolean,
+    name: String,
     onAnimationPlayed: () -> Unit,
 ) {
 
@@ -61,16 +63,16 @@ fun CheckListScreen(
         LottieCompositionSpec.RawRes(R.raw.koi_animation)
     )
 
-    val height = LocalConfiguration.current.screenHeightDp.dp.value
     val animatedBoxHeight = remember {
-        Animatable(initialValue = if (playAnimation) 0f else height * 0.65f)
+        Animatable(initialValue = if (playAnimation) 0f else 0.65f)
     }
     LaunchedEffect(key1 = true) {
         if (playAnimation) {
             animatedBoxHeight.animateTo(
-                height * 0.65f,
-                tween(700, easing = LinearOutSlowInEasing),
+                0.65f,
+                tween(durationMillis = 600, easing = LinearOutSlowInEasing),
             )
+            delay(3000)
             onAnimationPlayed()
         }
     }
@@ -88,11 +90,12 @@ fun CheckListScreen(
                 .fillMaxWidth()
                 .fillMaxHeight(0.4f)
         )
+        SlideAwayWelcomePrompt(inView = playAnimation, name = name)
         Box(
             Modifier
                 .fillMaxWidth()
                 .animateContentSize()
-                .height(animatedBoxHeight.value.dp)
+                .fillMaxHeight(animatedBoxHeight.value)
                 .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
                 .align(
                     Alignment.BottomCenter
@@ -110,7 +113,8 @@ fun CheckListScreen(
                 ) {
                     var c by remember { mutableStateOf(false) }
                     Box(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .animateItemPlacement(
                                 spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessLow)
                             )
