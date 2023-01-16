@@ -181,6 +181,7 @@ fun AnimatedCheckListItem(
                 animationSpec = tween(400, 10)
             )
         } else {
+            textOffset.animateTo(0.dp.value)
             colorTransition.animateTo(color.text)
         }
     }
