@@ -17,6 +17,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -36,6 +38,7 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
 import io.silv.jikannoto.R
 import io.silv.jikannoto.presentation.atoms.SwipeToDeleteLayout
+import io.silv.jikannoto.presentation.components.AnimatedHintTextField
 import io.silv.jikannoto.presentation.components.SlideAwayWelcomePrompt
 import io.silv.jikannoto.ui.theme.LocalCustomTheme
 import io.silv.jikannoto.ui.theme.LocalSpacing
@@ -44,7 +47,7 @@ import kotlinx.coroutines.delay
 import org.koin.androidx.compose.getViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun CheckListScreen(
     viewModel: CheckListViewModel = getViewModel(),
@@ -108,6 +111,7 @@ fun CheckListScreen(
                     Alignment.BottomCenter
                 )
                 .background(colors.background)
+                .padding(bottom = 4.dp)
         ) {
             LazyColumn(
                 Modifier
@@ -134,9 +138,10 @@ fun CheckListScreen(
                         ) {
                             AnimatedCheckListItem(
                                 modifier = Modifier
+                                    .background(colors.background)
+                                    .padding(8.dp)
                                     .fillMaxWidth()
                                     .height(35.dp)
-                                    .background(colors.background)
                                     .padding(start = 20.dp),
                                 content = it.name,
                                 complete = c,
@@ -147,9 +152,44 @@ fun CheckListScreen(
                     Spacer(modifier = Modifier.height(12.dp))
                 }
                 item {
-                    Box(modifier = Modifier.fillMaxWidth()) {
-                        IconButton(onClick = { viewModel.addCheckListItem("test adding item") }) {
-                            Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        var adding by remember { mutableStateOf(false) }
+                        var newCheckListItem by remember { mutableStateOf("") }
+                        AnimatedContent(targetState = adding) { targetState ->
+                            when (targetState) {
+                                true -> {
+                                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
+                                        AnimatedHintTextField(
+                                            modifier = Modifier.fillMaxWidth(0.7f).padding(start = 20.dp),
+                                            text = newCheckListItem,
+                                            hint = "checklist item",
+                                            textChangeHandler = { newCheckListItem = it }
+                                        )
+                                        IconButton(
+                                            onClick = {
+                                                newCheckListItem = ""
+                                                adding = false
+                                            }
+                                        ) {
+                                            Icon(imageVector = Icons.Default.Clear, contentDescription = "cancel", tint = colors.subtext)
+                                        }
+                                        IconButton(
+                                            onClick = {
+                                                viewModel.addCheckListItem(newCheckListItem)
+                                                newCheckListItem = ""
+                                                adding = false
+                                            }
+                                        ) {
+                                            Icon(imageVector = Icons.Default.Check, contentDescription = "Done", tint = colors.subtext)
+                                        }
+                                    }
+                                }
+                                false -> {
+                                    IconButton(onClick = { adding = true }) {
+                                        Icon(imageVector = Icons.Default.Add, contentDescription = "Add", tint = colors.subtext)
+                                    }
+                                }
+                            }
                         }
                     }
                 }

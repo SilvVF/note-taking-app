@@ -161,6 +161,7 @@ fun NotoView(
                                         IconButton(onClick = {
                                             viewModel.handleCategoryChange(newCategory, true)
                                             addingCategory = !addingCategory
+                                            newCategory = ""
                                         }) {
                                             Icon(
                                                 imageVector = Icons.Default.Check,
@@ -170,6 +171,7 @@ fun NotoView(
                                         }
                                         IconButton(onClick = {
                                             addingCategory = !addingCategory
+                                            newCategory = ""
                                         }) {
                                             Icon(
                                                 imageVector = Icons.Default.ArrowForward,

@@ -24,10 +24,15 @@ class CheckListRemoteDataSourceImpl(
     private val dispatcher: NotoDispatchers
 ) : CheckListRemoteDataSource {
     override suspend fun getAllItems() = flow {
-        val data = firestore.collection(Collections.checklist)
-            .whereEqualTo("owner", auth.currentUser?.email)
-            .get()
-            .await()
+        val data = runCatching {
+            firestore.collection(Collections.checklist)
+                .whereEqualTo("owner", auth.currentUser?.email)
+                .get()
+                .await()
+        }.getOrNull() ?: run {
+            emit(NotoFetchResult.Empty())
+            return@flow
+        }
         val checkListItems = buildList {
             data.documents.forEach { documentSnapshot ->
                 documentSnapshot.toObject<NetworkChecklistItem>()?.let {
