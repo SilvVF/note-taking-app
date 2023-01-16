@@ -55,4 +55,5 @@ fun String.toCategoryList(): List<String> =
     this.split(",")
         .map { it.trim() }
         .filter { it.isNotBlank() }
+        .toSet().toList()
         .ifEmpty { listOf("all") }

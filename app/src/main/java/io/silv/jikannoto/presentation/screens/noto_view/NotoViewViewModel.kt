@@ -76,23 +76,23 @@ class NotoViewViewModel(
     }
 
     fun handleCategoryChange(category: String, selected: Boolean) = intent {
-        val trimedCategory = category.trim()
+        val trimmedCategory = category.trim()
         reduce {
             state.copy(
                 noto = state.noto.copy(
                     // Select and unselect by name if not wanted move && ...
-                    category = if (selected && trimedCategory !in state.noto.category) {
-                        state.noto.category + trimedCategory
+                    category = if (selected && trimmedCategory !in state.noto.category) {
+                        state.noto.category + trimmedCategory
                     } else {
-                        state.noto.category.filter { it != trimedCategory }
+                        state.noto.category.filter { it != trimmedCategory }
                     }
                 )
             )
         }
-        if (trimedCategory !in state.categoryList) {
+        if (trimmedCategory !in state.categoryList) {
             reduce {
                 state.copy(
-                    categoryList = state.categoryList + trimedCategory
+                    categoryList = state.categoryList + trimmedCategory
                 )
             }
         }

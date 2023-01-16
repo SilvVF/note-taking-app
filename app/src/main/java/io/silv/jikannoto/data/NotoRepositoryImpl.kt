@@ -73,6 +73,9 @@ class NotoRepositoryImpl(
     ) = withContext(dispatcher.io) {
         var result: NotoApiResult<Nothing>? = null
         var userEmail: String? = null
+//        val etitle = encrypt(algorithm, title, key)
+//        val econtent = encrypt(algorithm, content, key)
+//        val ecategory = encrypt(algorithm, category, key)
         if (appDataStoreRepository.collectAllFlow.first().sync) {
             firebaseAuth.ifValidEmail(NotoApiResult.Exception<Nothing>(null) to null) { email ->
                 result = remoteDataSource.upsertNoto(
