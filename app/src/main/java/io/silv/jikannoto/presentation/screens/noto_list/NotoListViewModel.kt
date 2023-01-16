@@ -78,18 +78,47 @@ class NotoListViewModel(
 
     fun filterByCategoryChanged(category: String) = intent {
         when (category) {
-            "all" -> reduce { state.copy(notos = _notos.value) }
-            else -> {
-                val filteredNotos = _notos.value.filter { noto ->
-                    category in noto.category
-                }
+            in state.categoryFilter -> {
                 reduce {
                     state.copy(
-                        notos = filteredNotos
+                        categoryFilter = state.categoryFilter.filter {
+                            it != category
+                        }
+                            .toSet()
+                            .takeIf { it.isNotEmpty() } ?: setOf("all")
+                    )
+                }
+                reduce {
+                    state.copy(notos = filterNotos(state.categoryFilter))
+                }
+            }
+            "all" -> reduce {
+                state.copy(notos = _notos.value, categoryFilter = setOf("all"))
+            }
+            else -> {
+                reduce {
+                    val filter = state.categoryFilter.filter {
+                        it != "all"
+                    }.toSet() + category
+                    state.copy(
+                        categoryFilter = filter,
+                        notos = filterNotos(filter)
                     )
                 }
             }
         }
+    }
+
+    private fun filterNotos(categoryList: Set<String>): List<NotoItem> {
+        if (categoryList.contains("all")) {
+            return _notos.value
+        }
+        val filteredNotos = _notos.value.filter { noto ->
+            categoryList.any { filter ->
+                filter in noto.category
+            }
+        }
+        return filteredNotos
     }
     private fun fetchNotos() = intent {
         reduce { state.copy(loading = true) }
@@ -108,7 +137,7 @@ data class NotoListState(
     val loading: Boolean = false,
     val notos: List<NotoItem> = emptyList(),
     val searchText: String = "",
-    val categoryFilter: String = "all",
+    val categoryFilter: Set<String> = setOf("all"),
     val categoryList: List<String> = emptyList()
 )
 

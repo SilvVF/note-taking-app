@@ -2,8 +2,9 @@ package io.silv.jikannoto.presentation.screens.noto_list
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomSheetScaffold
 import androidx.compose.material.ExperimentalMaterialApi
@@ -68,14 +69,29 @@ fun NotoListScreen(
         sheetShape = RoundedCornerShape(22.dp),
         sheetGesturesEnabled = true,
         sheetContent = {
-            LazyColumn(
-                Modifier
-                    .fillMaxWidth()
-                    .requiredHeight(200.dp)
-                    .wrapContentHeight()
+            Text(
+                text = "filters",
+                color = LocalCustomTheme.current.subtext,
+                modifier = Modifier.padding(18.dp)
+            )
+            LazyVerticalGrid(
+                modifier = Modifier.fillMaxWidth(),
+                columns = GridCells.Adaptive(100.dp),
+                contentPadding = PaddingValues(bottom = 16.dp)
             ) {
                 items(state.categoryList) {
-                    Text(text = it)
+                    CategoryListItem(
+                        category = it,
+                        selected = remember(state.categoryFilter) {
+                            derivedStateOf {
+                                state.categoryFilter.any { filter ->
+                                    filter == it
+                                }
+                            }.value
+                        }
+                    ) { category ->
+                        viewModel.filterByCategoryChanged(category)
+                    }
                 }
             }
         }
@@ -102,14 +118,19 @@ fun NotoListScreen(
             }
         ) {
             Spacer(modifier = Modifier.height(120.dp))
-            Text("${state.categoryFilter} notos", color = color.subtext)
+            Text("${state.categoryFilter.joinToString()} notos", color = color.subtext)
             state.notos.forEach { noto ->
                 key(noto.id) {
                     SwipeToDeleteLayout(
                         onDelete = { viewModel.deleteNoto(noto.id) },
                         onClick = { onNavigateToNotoView(noto) }
                     ) {
-                        NotoContent(noto = noto)
+                        NotoContent(
+                            noto = noto,
+                            onCategorySelected = { category ->
+                                viewModel.filterByCategoryChanged(category)
+                            }
+                        )
                     }
                     Spacer(modifier = Modifier.height(2.dp))
                 }

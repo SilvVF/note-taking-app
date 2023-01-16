@@ -18,7 +18,10 @@ import io.silv.jikannoto.ui.theme.LocalSpacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotoContent(noto: NotoItem) {
+fun NotoContent(
+    noto: NotoItem,
+    onCategorySelected: (category: String) -> Unit = { }
+) {
 
     val color = LocalCustomTheme.current
 
@@ -56,7 +59,7 @@ fun NotoContent(noto: NotoItem) {
                     }.getOrDefault(noto.category)
                 ) {
                     SuggestionChip(
-                        onClick = { },
+                        onClick = { onCategorySelected(category) },
                         modifier = Modifier
                             .height(20.dp)
                             .wrapContentWidth()
