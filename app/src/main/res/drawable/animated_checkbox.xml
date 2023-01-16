@@ -12,15 +12,15 @@
                 <path
                     android:name="box"
                     android:pathData="M 24 0.5 L 40 0.5 C 48.581 0.5 54.415 2.181 58.117 5.883 C 61.819 9.585 63.5 15.419 63.5 24 L 63.5 40 C 63.5 48.581 61.819 54.415 58.117 58.117 C 54.415 61.819 48.581 63.5 40 63.5 L 24 63.5 C 15.419 63.5 9.585 61.819 5.883 58.117 C 2.181 54.415 0.5 48.581 0.5 40 L 0.5 24 C 0.5 15.419 2.181 9.585 5.883 5.883 C 9.585 2.181 15.419 0.5 24 0.5 Z"
-                    android:fillColor="#77A2DC"
-                    android:strokeColor="#77A2DC"
+                    android:fillColor="#FF1A85D5"
+                    android:strokeColor="#FF1A85D5"
                     android:strokeWidth="4"
                     android:strokeLineCap="round"
                     android:strokeLineJoin="round"/>
                 <path
                     android:name="checkoverflow"
                     android:pathData="M 15 31.198 C 23.108 36.488 29.595 43 29.595 43 C 29.595 43 37.5 25.5 69 1.5"
-                    android:strokeColor="#77A2DC"
+                    android:strokeColor="#FF1A85D5"
                     android:strokeWidth="9"
                     android:trimPathEnd="0.95"
                     android:strokeLineCap="round"

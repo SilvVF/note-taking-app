@@ -66,7 +66,9 @@ class NotoListViewModel(
                 reduce {
                     state.copy(
                         notos = _notos.value.filter {
-                            text.lowercase() in it.title.lowercase() || text.lowercase() in it.content.lowercase()
+                            text.lowercase() in it.title.lowercase() ||
+                                text.lowercase() in it.content.lowercase() ||
+                                it.category.any { c -> text.lowercase() in c.lowercase() }
                         }
                     )
                 }

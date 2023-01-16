@@ -102,9 +102,9 @@ fun NotoListScreen(
             }
         ) {
             Spacer(modifier = Modifier.height(120.dp))
-            Text("${state.categoryFilter} notos")
-            key(state.notos) {
-                state.notos.forEach { noto ->
+            Text("${state.categoryFilter} notos", color = color.subtext)
+            state.notos.forEach { noto ->
+                key(noto.id) {
                     SwipeToDeleteLayout(
                         onDelete = { viewModel.deleteNoto(noto.id) },
                         onClick = { onNavigateToNotoView(noto) }

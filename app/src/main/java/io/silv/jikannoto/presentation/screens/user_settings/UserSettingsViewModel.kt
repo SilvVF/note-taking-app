@@ -75,7 +75,7 @@ class UserSettingsViewModel(
         }
         intent { appDataStoreRepository.setFirstName(firstName) }
     }
-    fun changeLastName(lastName: String) = intent {
+    fun changeLastName(lastName: String) = blockingIntent {
         reduce {
             state.copy(
                 settings = state.settings.copy(lastName = lastName)
