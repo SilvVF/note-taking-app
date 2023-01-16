@@ -21,6 +21,8 @@ class NotoViewViewModel(
     override val container = container<NotoViewState, NotoViewSideEffect>(NotoViewState()) {
         init()
     }
+
+    private var notoReceivedState: NotoItem? = null
     private fun init() = intent {
         repeatOnSubscription {
             notoRepo.localNotoFlow.collect {
@@ -41,17 +43,19 @@ class NotoViewViewModel(
             reduce {
                 state.copy(noto = it)
             }
+            notoReceivedState = it
         }
     }
 
     fun addNoto(noto: NotoItem) = intent {
-        notoRepo.upsertNoto(
-            id = noto.id,
-            title = noto.title,
-            content = noto.content,
-            category = noto.category.toString().removeSurrounding(prefix = "[", suffix = "]").trim(),
-            dateCreated = noto.dateCreated.toJavaLocalDateTime().toEpochSecond(ZoneOffset.UTC) * 1000
-        )
+        if (noto != notoReceivedState)
+            notoRepo.upsertNoto(
+                id = noto.id,
+                title = noto.title,
+                content = noto.content,
+                category = noto.category.toString().removeSurrounding(prefix = "[", suffix = "]").trim(),
+                dateCreated = noto.dateCreated.toJavaLocalDateTime().toEpochSecond(ZoneOffset.UTC) * 1000
+            )
         postSideEffect(NotoViewSideEffect.NotoSaved)
     }
 
@@ -72,23 +76,23 @@ class NotoViewViewModel(
     }
 
     fun handleCategoryChange(category: String, selected: Boolean) = intent {
-        val category = category.trim()
+        val trimedCategory = category.trim()
         reduce {
             state.copy(
                 noto = state.noto.copy(
                     // Select and unselect by name if not wanted move && ...
-                    category = if (selected && category !in state.noto.category) {
-                        state.noto.category + category
+                    category = if (selected && trimedCategory !in state.noto.category) {
+                        state.noto.category + trimedCategory
                     } else {
-                        state.noto.category.filter { it != category }
+                        state.noto.category.filter { it != trimedCategory }
                     }
                 )
             )
         }
-        if (category !in state.categoryList) {
+        if (trimedCategory !in state.categoryList) {
             reduce {
                 state.copy(
-                    categoryList = state.categoryList + category
+                    categoryList = state.categoryList + trimedCategory
                 )
             }
         }

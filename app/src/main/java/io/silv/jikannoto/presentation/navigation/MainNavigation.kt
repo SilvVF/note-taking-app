@@ -3,9 +3,7 @@ package io.silv.jikannoto.presentation.navigation
 import UserSettingsScreen
 import androidx.compose.animation.*
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -25,6 +23,9 @@ fun MainNavigation(
     showToast: (String) -> Unit,
     onMenuClicked: () -> Unit
 ) {
+    var playAnimation by rememberSaveable {
+        mutableStateOf(true)
+    }
     NavHost(
         navController = navController,
         startDestination = Screens.CheckList.route
@@ -32,7 +33,9 @@ fun MainNavigation(
         composable(
             route = Screens.CheckList.route
         ) {
-            CheckListScreen()
+            CheckListScreen(playAnimation = playAnimation) {
+                playAnimation = false
+            }
         }
         composable(
             route = Screens.UserSettings.route
@@ -67,8 +70,8 @@ fun MainNavigation(
                 when (it) {
                     1 -> NotoListScreen(
                         onNavigateToNotoView = { selectedNoto ->
-                            setCurrentScreen(2)
                             setCurrentNoto(selectedNoto ?: NotoItem.blankItem())
+                            setCurrentScreen(2)
                         },
                         onNavigate = { navTarget ->
                             navController.navigate(navTarget.route)

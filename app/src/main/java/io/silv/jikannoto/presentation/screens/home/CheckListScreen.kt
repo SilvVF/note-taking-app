@@ -1,5 +1,6 @@
 package io.silv.jikannoto.presentation.screens.home
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.*
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
@@ -18,6 +19,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.airbnb.lottie.compose.LottieAnimation
@@ -31,7 +34,9 @@ import org.koin.androidx.compose.getViewModel
 
 @Composable
 fun CheckListScreen(
-    viewModel: CheckListViewModel = getViewModel()
+    viewModel: CheckListViewModel = getViewModel(),
+    playAnimation: Boolean,
+    onAnimationPlayed: () -> Unit,
 ) {
 
     val colors = LocalCustomTheme.current
@@ -50,6 +55,20 @@ fun CheckListScreen(
         LottieCompositionSpec.RawRes(R.raw.koi_animation)
     )
 
+    val height = LocalConfiguration.current.screenHeightDp.dp.value
+    val animatedBoxHeight = remember {
+        Animatable(initialValue = if (playAnimation) 0f else height * 0.65f)
+    }
+    LaunchedEffect(key1 = true) {
+        if (playAnimation) {
+            animatedBoxHeight.animateTo(
+                height * 0.65f,
+                tween(700, easing = LinearOutSlowInEasing),
+            )
+            onAnimationPlayed()
+        }
+    }
+
     Box(
         Modifier
             .fillMaxSize()
@@ -66,7 +85,8 @@ fun CheckListScreen(
         Box(
             Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.65f)
+                .animateContentSize()
+                .height(animatedBoxHeight.value.dp)
                 .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
                 .align(
                     Alignment.BottomCenter
@@ -79,7 +99,7 @@ fun CheckListScreen(
                     .fillMaxWidth()
                     .height(35.dp)
                     .padding(start = 20.dp),
-                content = "jdfafdfdafasfsdfsfasfdfasfle",
+                content = "jsfdfasfle",
                 complete = c,
                 onCompleteChanged = { c = it }
             )
@@ -97,12 +117,44 @@ fun AnimatedCheckListItem(
 ) {
 
     val isDark = LocalTheme.current.dark
+    val color = LocalCustomTheme.current
 
     val image = rememberAnimatedVectorPainter(
         AnimatedImageVector.animatedVectorResource(
             id = R.drawable.animated_checkbox
         ),
         atEnd = complete
+    )
+
+    val textOffset = remember {
+        Animatable(initialValue = 0.dp.value)
+    }
+
+    val colorTransition = remember {
+        androidx.compose.animation.Animatable(
+            initialValue = color.text
+        )
+    }
+
+    LaunchedEffect(key1 = complete, isDark) {
+        if (complete) {
+            textOffset.animateTo(
+                6.dp.value,
+                spring()
+            )
+            textOffset.animateTo(0.dp.value)
+            colorTransition.animateTo(
+                if (isDark) Color(0xff334155) else Color.LightGray,
+                animationSpec = tween(400, 10)
+            )
+        } else {
+            colorTransition.animateTo(color.text)
+        }
+    }
+
+    val strikeThroughWidthMultiplier by animateFloatAsState(
+        targetValue = if (complete) 1f else 0f,
+        animationSpec = tween(400)
     )
 
     Row(modifier, verticalAlignment = Alignment.CenterVertically) {
@@ -118,16 +170,21 @@ fun AnimatedCheckListItem(
 
         Text(
             text = content,
-            color = LocalCustomTheme.current.text,
+            color = colorTransition.value,
             // style = if (complete) TextStyle(textDecoration = TextDecoration.LineThrough) else TextStyle(),
-            modifier = Modifier.drawWithContent {
-                drawContent()
-                drawLine(
-                    color = Color.LightGray,
-                    start = Offset(this.size.width * 0.1f, this.center.y),
-                    end = Offset(this.size.width * 0.9f, this.center.y),
-                )
-            }
+            modifier = Modifier
+                .padding(start = textOffset.value.dp)
+                .drawWithContent {
+                    drawContent()
+                    drawLine(
+                        color = if (strikeThroughWidthMultiplier != 0f) colorTransition.value
+                        else Color.Transparent,
+                        start = Offset(0f, this.center.y),
+                        end = Offset(strikeThroughWidthMultiplier * this.size.width, this.center.y),
+                        strokeWidth = 8f,
+                        cap = StrokeCap.Round
+                    )
+                }
         )
     }
 }
@@ -146,7 +203,7 @@ fun AnimatedCheckListItemPreview() {
                 .fillMaxWidth(0.8f)
                 .height(50.dp)
                 .align(Alignment.Center),
-            content = "jkaljsdflsjdf",
+            content = "jkjdf",
             complete = c,
             onCompleteChanged = { c = !c },
         )

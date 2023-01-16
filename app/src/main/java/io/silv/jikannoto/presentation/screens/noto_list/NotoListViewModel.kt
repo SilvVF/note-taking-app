@@ -76,12 +76,12 @@ class NotoListViewModel(
         } else reduce { state.copy(notos = _notos.value) }
     }
 
-    fun filterByCategoryChanged(cat: String) = intent {
-        when (cat) {
+    fun filterByCategoryChanged(category: String) = intent {
+        when (category) {
             "all" -> reduce { state.copy(notos = _notos.value) }
             else -> {
                 val filteredNotos = _notos.value.filter { noto ->
-                    cat in noto.category
+                    category in noto.category
                 }
                 reduce {
                     state.copy(
