@@ -6,10 +6,13 @@ import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -21,17 +24,20 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
 import io.silv.jikannoto.R
+import io.silv.jikannoto.presentation.atoms.SwipeToDeleteLayout
 import io.silv.jikannoto.ui.theme.LocalCustomTheme
 import io.silv.jikannoto.ui.theme.LocalSpacing
 import io.silv.jikannoto.ui.theme.LocalTheme
 import org.koin.androidx.compose.getViewModel
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CheckListScreen(
     viewModel: CheckListViewModel = getViewModel(),
@@ -91,18 +97,45 @@ fun CheckListScreen(
                 .align(
                     Alignment.BottomCenter
                 )
-                .background(colors.background.copy(alpha = 0.9f))
+                .background(colors.background)
         ) {
-            var c by remember { mutableStateOf(false) }
-            AnimatedCheckListItem(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(35.dp)
-                    .padding(start = 20.dp),
-                content = "jsfdfasfle",
-                complete = c,
-                onCompleteChanged = { c = it }
-            )
+            LazyColumn(
+                Modifier
+                    .fillMaxSize()
+                    .padding(top = 16.dp)
+            ) {
+                items(
+                    viewModel.checkListItems,
+                    key = { it }
+                ) {
+                    var c by remember { mutableStateOf(false) }
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
+                            .animateItemPlacement(
+                                spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessLow)
+                            )
+                    ) {
+                        SwipeToDeleteLayout(
+                            onDelete = {
+                                viewModel.checkListItems = viewModel.checkListItems.minusElement(it)
+                            },
+                            onClick = { },
+                        ) {
+                            AnimatedCheckListItem(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(35.dp)
+                                    .background(colors.background)
+                                    .padding(start = 20.dp),
+                                content = "jsfdfasfle $it",
+                                complete = c,
+                                onCompleteChanged = { c = it }
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+            }
         }
     }
 }
@@ -171,7 +204,8 @@ fun AnimatedCheckListItem(
         Text(
             text = content,
             color = colorTransition.value,
-            // style = if (complete) TextStyle(textDecoration = TextDecoration.LineThrough) else TextStyle(),
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1,
             modifier = Modifier
                 .padding(start = textOffset.value.dp)
                 .drawWithContent {
