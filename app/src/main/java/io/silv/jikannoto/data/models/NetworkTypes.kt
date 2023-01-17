@@ -13,6 +13,7 @@ data class NetworkNoto(
 
 data class NetworkChecklistItem(
     val id: String = UUID.randomUUID().toString(),
+    val email: String = "",
     val dateCreated: Long,
     val name: String,
     val completed: Boolean,

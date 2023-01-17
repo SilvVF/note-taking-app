@@ -71,6 +71,19 @@ class AppDataStoreRepository(
         }
     }
 
+    val encryptKeyFlow: Flow<ByteArray?> = context.dataStore.data
+        .map { preferences ->
+            preferences[encryptKey]?.toByteArray()
+        }.flowOn(dispatchers.io)
+
+    fun setEncryptKey(
+        byteArray: ByteArray
+    ) = CoroutineScope(dispatchers.io).launch {
+        context.dataStore.edit { preferences ->
+            preferences[encryptKey] = byteArray.decodeToString()
+        }
+    }
+
     val collectAllFlow: Flow<DataStoreState> =
         combine(
             firstNameFlow,
@@ -90,6 +103,7 @@ class AppDataStoreRepository(
         val lastNameKey = stringPreferencesKey("LAST_NAME_KEY")
         val darkThemeKey = booleanPreferencesKey("DARK_THEME_KEY")
         val syncKey = booleanPreferencesKey("SYNC_KEY")
+        val encryptKey = stringPreferencesKey("ENCRYPT_KEY")
     }
     data class DataStoreState(
         val firstname: String,

@@ -67,6 +67,7 @@ class CheckListRemoteDataSourceImpl(
         firestore.collection(Collections.checklist)
             .add(
                 NetworkChecklistItem(
+                    email = auth.currentUser?.email ?: return@suspendCancellableCoroutine,
                     id = checklistItem.id,
                     name = checklistItem.name,
                     dateCreated = checklistItem.dateCreated.toJavaLocalDateTime().toEpochSecond(

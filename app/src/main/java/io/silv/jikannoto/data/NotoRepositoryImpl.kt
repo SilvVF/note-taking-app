@@ -5,8 +5,9 @@ import com.google.firebase.auth.FirebaseAuth
 import io.silv.jikannoto.data.local.NotoLocalDataSource
 import io.silv.jikannoto.data.models.NetworkNoto
 import io.silv.jikannoto.data.remote.NotoRemoteDataSource
+import io.silv.jikannoto.data.util.Crypto
 import io.silv.jikannoto.data.util.NotoDispatchers
-import io.silv.jikannoto.domain.mappers.toDomain
+import io.silv.jikannoto.domain.mappers.decrpytToDomain
 import io.silv.jikannoto.domain.mappers.toEntity
 import io.silv.jikannoto.domain.models.NotoItem
 import io.silv.jikannoto.domain.result.NotoApiResult
@@ -19,17 +20,25 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
+import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.serializer
 
 class NotoRepositoryImpl(
     private val localDataSource: NotoLocalDataSource,
     private val remoteDataSource: NotoRemoteDataSource,
     private val firebaseAuth: FirebaseAuth,
     private val appDataStoreRepository: AppDataStoreRepository,
-    private val dispatcher: NotoDispatchers
+    private val dispatcher: NotoDispatchers,
+    private val crypto: Crypto
 ) {
     val localNotoFlow = localDataSource.getAllNotos().map {
-        it.map { entity ->
-            entity.toDomain()
+        val key = appDataStoreRepository.encryptKeyFlow.first()
+            ?: crypto.generateKey(crypto.aesGCMKeySize).also { k -> appDataStoreRepository.setEncryptKey(k) }
+        it.mapNotNull { entity ->
+            entity.decrpytToDomain(
+                crypto, key
+            )
         }
     }.flowOn(dispatcher.io)
 
@@ -45,7 +54,16 @@ class NotoRepositoryImpl(
                 }
             }
         }
-        emit(localDataSource.getAllNotos().first().map { it.toDomain() })
+        emit(
+            localDataSource.getAllNotos().first().mapNotNull {
+                it.decrpytToDomain(
+                    crypto,
+                    appDataStoreRepository.encryptKeyFlow.first()
+                        ?: crypto.generateKey(crypto.aesGCMKeySize)
+                            .also { k -> appDataStoreRepository.setEncryptKey(k) }
+                )
+            }
+        )
     }.flowOn(dispatcher.io)
 
     private suspend fun syncNotosFromNetwork(notos: List<NetworkNoto>) {
@@ -64,6 +82,7 @@ class NotoRepositoryImpl(
         }
     }
 
+    @OptIn(InternalSerializationApi::class)
     suspend fun upsertNoto(
         id: String = UUID.randomUUID().toString(),
         title: String,
@@ -71,27 +90,38 @@ class NotoRepositoryImpl(
         category: String,
         dateCreated: Long = Clock.System.now().toEpochMilliseconds()
     ) = withContext(dispatcher.io) {
+
         var result: NotoApiResult<Nothing>? = null
         var userEmail: String? = null
-//        val etitle = encrypt(algorithm, title, key)
-//        val econtent = encrypt(algorithm, content, key)
-//        val ecategory = encrypt(algorithm, category, key)
-        if (appDataStoreRepository.collectAllFlow.first().sync) {
-            firebaseAuth.ifValidEmail(NotoApiResult.Exception<Nothing>(null) to null) { email ->
-                result = remoteDataSource.upsertNoto(
-                    NetworkNoto(id, dateCreated, title, content, email, category)
-                )
-                userEmail = email
+        val s = Crypto.Ciphertext::class.serializer()
+
+        runCatching {
+
+            val key = appDataStoreRepository.encryptKeyFlow.first()
+                ?: crypto.generateKey(crypto.aesGCMKeySize)
+                    .also { appDataStoreRepository.setEncryptKey(it) }
+
+            val etitle = Json.encodeToString(s, crypto.encryptGcm(title.toByteArray(), key))
+            val econtent = Json.encodeToString(s, crypto.encryptGcm(content.toByteArray(), key))
+            val ecategory = Json.encodeToString(s, crypto.encryptGcm(category.toByteArray(), key))
+
+            if (appDataStoreRepository.collectAllFlow.first().sync) {
+                firebaseAuth.ifValidEmail(NotoApiResult.Exception<Nothing>(null) to null) { email ->
+                    result = remoteDataSource.upsertNoto(
+                        NetworkNoto(id, dateCreated, etitle, econtent, email, ecategory)
+                    )
+                    userEmail = email
+                }
             }
-        }
-        localDataSource.insertNoto(
-            NotoEntity(
-                id, title, content, userEmail ?: "", category,
-                synced = result is NotoApiResult.Success<*>,
-                dateCreated = dateCreated,
-                lastSync = Clock.System.now().toEpochMilliseconds()
+            localDataSource.insertNoto(
+                NotoEntity(
+                    id, etitle, econtent, userEmail ?: "", ecategory,
+                    synced = result is NotoApiResult.Success<*>,
+                    dateCreated = dateCreated,
+                    lastSync = Clock.System.now().toEpochMilliseconds()
+                )
             )
-        )
+        }
     }
 
     suspend fun deleteNoto(id: String) = withContext(dispatcher.io) {

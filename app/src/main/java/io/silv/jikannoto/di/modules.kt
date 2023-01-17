@@ -14,6 +14,7 @@ import io.silv.jikannoto.data.local.CheckListLocalDataSourceImpl
 import io.silv.jikannoto.data.local.NotoLocalDataSource
 import io.silv.jikannoto.data.local.NotoLocalDataSourceImpl
 import io.silv.jikannoto.data.remote.*
+import io.silv.jikannoto.data.util.Crypto
 import io.silv.jikannoto.data.util.NotoDispatchers
 import io.silv.jikannoto.presentation.screens.check_list.CheckListViewModel
 import io.silv.jikannoto.presentation.screens.noto_list.NotoListViewModel
@@ -51,6 +52,7 @@ val appModule = module {
 
     factoryOf(::CheckListRepositoryImpl)
     factoryOf(::NotoRepositoryImpl)
+    factoryOf(::Crypto)
 
     viewModelOf(::UserSettingsViewModel)
     viewModelOf(::NotoListViewModel)

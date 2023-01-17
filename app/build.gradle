@@ -5,6 +5,7 @@ plugins {
     id 'com.google.gms.google-services'
     id 'com.squareup.sqldelight'
     id 'kotlin-kapt'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.8.0'
 }
 
 android {
@@ -122,6 +123,9 @@ dependencies {
 
     //lottie
     implementation "com.airbnb.android:lottie-compose:$lottie_version"
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+
 }
 
 sqldelight {

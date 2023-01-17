@@ -22,6 +22,7 @@ data class NotoItem(
             NotoItem(UUID.randomUUID().toString(), emptyList(), dateTimeNow(), "", "", false)
     }
 }
+
 data class CheckListItem(
     val id: String = UUID.randomUUID().toString(),
     val dateCreated: LocalDateTime,
