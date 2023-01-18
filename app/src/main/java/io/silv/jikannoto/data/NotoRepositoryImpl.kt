@@ -33,11 +33,10 @@ class NotoRepositoryImpl(
     private val crypto: Crypto
 ) {
     private suspend fun getEncryptionKey() = appDataStoreRepository.encryptKeyFlow.first()
-            ?: crypto.generateKey(crypto.aesGCMKeySize).also {
-                    k -> appDataStoreRepository.setEncryptKey(k)
-            }
-
-
+        ?: crypto.generateKey(crypto.aesGCMKeySize).also {
+            k ->
+            appDataStoreRepository.setEncryptKey(k)
+        }
 
     val localNotoFlow = localDataSource.getAllNotos().map {
         it.mapNotNull { entity ->

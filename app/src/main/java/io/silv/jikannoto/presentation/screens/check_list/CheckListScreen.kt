@@ -283,7 +283,7 @@ fun AnimatedCheckListItem(
     }
 }
 
-@Preview()
+@Preview
 @Composable
 fun AnimatedCheckListItemPreview() {
     Box(

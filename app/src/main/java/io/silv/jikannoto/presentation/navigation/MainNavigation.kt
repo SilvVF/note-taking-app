@@ -1,6 +1,5 @@
 package io.silv.jikannoto.presentation.navigation
 
-import UserSettingsScreen
 import androidx.compose.animation.*
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
@@ -13,6 +12,7 @@ import io.silv.jikannoto.domain.models.NotoItem
 import io.silv.jikannoto.presentation.screens.check_list.CheckListScreen
 import io.silv.jikannoto.presentation.screens.noto_list.NotoListScreen
 import io.silv.jikannoto.presentation.screens.noto_view.NotoView
+import io.silv.jikannoto.presentation.screens.user_settings.UserSettingsScreen
 import java.util.*
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -81,8 +81,8 @@ fun MainNavigation(
                             navController.navigate(navTarget.route)
                         },
                         onMenuClick = onMenuClicked,
-                        showToast = {
-                            showToast(it)
+                        showToast = { message ->
+                            showToast(message)
                         }
                     )
                     else -> {

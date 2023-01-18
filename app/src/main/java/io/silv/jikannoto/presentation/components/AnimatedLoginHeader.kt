@@ -27,7 +27,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import currentFraction
+import io.silv.jikannoto.presentation.screens.user_settings.currentFraction
 import io.silv.jikannoto.ui.theme.LocalCustomTheme
 
 @OptIn(ExperimentalMaterialApi::class)

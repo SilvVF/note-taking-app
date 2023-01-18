@@ -28,7 +28,7 @@ class FakeLocalDataSource : NotoLocalDataSource {
         )
     }.toMutableList()
 
-    override suspend fun getNotoById(id: String): NotoEntity? {
+    override suspend fun getNotoById(id: String): NotoEntity {
         return NotoEntity(
             id = UUID.randomUUID().toString(),
             title = LoremIpsum(

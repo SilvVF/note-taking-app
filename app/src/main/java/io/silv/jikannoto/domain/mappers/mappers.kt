@@ -10,7 +10,7 @@ import kotlinx.datetime.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
-//fun NetworkNoto.toDomainNoto(): NotoItem {
+// fun NetworkNoto.toDomainNoto(): NotoItem {
 //    return NotoItem(
 //        id = id,
 //        dateCreated = Clock.System.now().toLocalDateTime(TimeZone.UTC),
@@ -19,7 +19,7 @@ import kotlinx.serialization.json.Json
 //        synced = true,
 //        category = category.toCategoryList(),
 //    )
-//}
+// }
 
 fun NotoEntity.decrpytToDomain(crypto: Crypto, key: ByteArray): NotoItem? {
 
@@ -66,7 +66,7 @@ fun NetworkNoto.toEntity(): NotoEntity {
     )
 }
 
-//fun NotoEntity.toDomain(): NotoItem {
+// fun NotoEntity.toDomain(): NotoItem {
 //    return NotoItem(
 //        id = id,
 //        dateCreated = Instant.fromEpochMilliseconds(dateCreated).toLocalDateTime(TimeZone.UTC),
@@ -75,16 +75,16 @@ fun NetworkNoto.toEntity(): NotoEntity {
 //        category = category.toCategoryList(),
 //        synced = synced ?: false,
 //    )
-//}
+// }
 //
-//fun CheckListEntity.toDomain(): CheckListItem {
+// fun CheckListEntity.toDomain(): CheckListItem {
 //    return CheckListItem(
 //        id = id,
 //        dateCreated = Instant.fromEpochMilliseconds(dateCreated).toLocalDateTime(TimeZone.UTC),
 //        name = name,
 //        completed = completed ?: false
 //    )
-//}
+// }
 
 fun String.toCategoryList(): List<String> =
     this.split(",")

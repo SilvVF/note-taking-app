@@ -25,7 +25,8 @@ class CheckListRepositoryImpl(
 ) {
     private suspend fun getEncryptionKey() = appDataStoreRepository.encryptKeyFlow.first()
         ?: crypto.generateKey(crypto.aesGCMKeySize).also {
-                k -> appDataStoreRepository.setEncryptKey(k)
+            k ->
+            appDataStoreRepository.setEncryptKey(k)
         }
 
     val checkListFlow = local.getAllItems().mapNotNull { list ->
@@ -103,6 +104,6 @@ fun List<CheckListEntity>.decryptNotNull(
 ) = this.mapNotNull {
     it.decryptToDomain(
         crypto,
-       key
+        key
     )
 }

@@ -1,3 +1,8 @@
+
+@file:OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
+
+package io.silv.jikannoto.presentation.screens.user_settings
+
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
@@ -22,8 +27,6 @@ import io.silv.jikannoto.presentation.components.*
 import io.silv.jikannoto.presentation.components.AnimatedHintTextField
 import io.silv.jikannoto.presentation.components.SettingToggle
 import io.silv.jikannoto.presentation.navigation.Screens
-import io.silv.jikannoto.presentation.screens.user_settings.UserSettingsScreenEffect
-import io.silv.jikannoto.presentation.screens.user_settings.UserSettingsViewModel
 import io.silv.jikannoto.ui.theme.LocalCustomTheme
 import io.silv.jikannoto.ui.theme.LocalSpacing
 import kotlinx.coroutines.launch
@@ -31,7 +34,6 @@ import org.koin.androidx.compose.getViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun UserSettingsScreen(
     authed: Boolean,
