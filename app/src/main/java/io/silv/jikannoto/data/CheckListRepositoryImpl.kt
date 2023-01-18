@@ -23,25 +23,23 @@ class CheckListRepositoryImpl(
     private val dispatchers: NotoDispatchers,
     private val crypto: Crypto
 ) {
+    private suspend fun getEncryptionKey() = appDataStoreRepository.encryptKeyFlow.first()
+        ?: crypto.generateKey(crypto.aesGCMKeySize).also {
+                k -> appDataStoreRepository.setEncryptKey(k)
+        }
 
     val checkListFlow = local.getAllItems().mapNotNull { list ->
-        list.mapNotNull {
-            it.decryptToDomain(
-                crypto,
-                appDataStoreRepository.encryptKeyFlow.first()
-                    ?: crypto.generateKey(crypto.aesGCMKeySize)
-                        .also { k -> appDataStoreRepository.setEncryptKey(k) }
-            )
-        }
+        list.decryptNotNull(crypto, getEncryptionKey())
     }.flowOn(dispatchers.io)
 
-    suspend fun getAllItems(localOnly: Boolean) = flow<List<CheckListItem>> {
+    suspend fun getAllItems(localOnly: Boolean) = flow {
+        val key = getEncryptionKey()
         if (localOnly || !appDataStoreRepository.collectAllFlow.first().sync) {
-            emit(local.getAllItems().first().decryptNotNull(crypto, appDataStoreRepository))
+            emit(local.getAllItems().first().decryptNotNull(crypto, key))
             return@flow
         }
         val localItems = local.getAllItems().first()
-        emit(localItems.decryptNotNull(crypto, appDataStoreRepository))
+        emit(localItems.decryptNotNull(crypto, key))
         remote.getAllItems().first().onSuccess { data ->
             data.forEach { networkItem ->
                 local.upsertItem(
@@ -55,7 +53,7 @@ class CheckListRepositoryImpl(
                 )
             }
         }
-        emit(local.getAllItems().first().decryptNotNull(crypto, appDataStoreRepository))
+        emit(local.getAllItems().first().decryptNotNull(crypto, key))
         coroutineScope { syncWithNetwork() }
     }.flowOn(dispatchers.io)
 
@@ -75,9 +73,7 @@ class CheckListRepositoryImpl(
                     Crypto.Ciphertext::class.serializer(),
                     crypto.encryptGcm(
                         checkListItem.name.toByteArray(),
-                        appDataStoreRepository.encryptKeyFlow.first()
-                            ?: crypto.generateKey(crypto.aesGCMKeySize)
-                                .also { k -> appDataStoreRepository.setEncryptKey(k) }
+                        getEncryptionKey()
                     )
                 ),
                 id = checkListItem.id,
@@ -101,15 +97,12 @@ class CheckListRepositoryImpl(
         }
     }
 }
-
-suspend fun List<CheckListEntity>.decryptNotNull(
+fun List<CheckListEntity>.decryptNotNull(
     crypto: Crypto,
-    appDataStoreRepository: AppDataStoreRepository
+    key: ByteArray
 ) = this.mapNotNull {
     it.decryptToDomain(
         crypto,
-        appDataStoreRepository.encryptKeyFlow.first()
-            ?: crypto.generateKey(crypto.aesGCMKeySize)
-                .also { k -> appDataStoreRepository.setEncryptKey(k) }
+       key
     )
 }

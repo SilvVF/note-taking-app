@@ -32,13 +32,16 @@ class NotoRepositoryImpl(
     private val dispatcher: NotoDispatchers,
     private val crypto: Crypto
 ) {
+    private suspend fun getEncryptionKey() = appDataStoreRepository.encryptKeyFlow.first()
+            ?: crypto.generateKey(crypto.aesGCMKeySize).also {
+                    k -> appDataStoreRepository.setEncryptKey(k)
+            }
+
+
+
     val localNotoFlow = localDataSource.getAllNotos().map {
-        val key = appDataStoreRepository.encryptKeyFlow.first()
-            ?: crypto.generateKey(crypto.aesGCMKeySize).also { k -> appDataStoreRepository.setEncryptKey(k) }
         it.mapNotNull { entity ->
-            entity.decrpytToDomain(
-                crypto, key
-            )
+            entity.decrpytToDomain(crypto, getEncryptionKey())
         }
     }.flowOn(dispatcher.io)
 
@@ -58,9 +61,7 @@ class NotoRepositoryImpl(
             localDataSource.getAllNotos().first().mapNotNull {
                 it.decrpytToDomain(
                     crypto,
-                    appDataStoreRepository.encryptKeyFlow.first()
-                        ?: crypto.generateKey(crypto.aesGCMKeySize)
-                            .also { k -> appDataStoreRepository.setEncryptKey(k) }
+                    getEncryptionKey()
                 )
             }
         )
@@ -97,9 +98,7 @@ class NotoRepositoryImpl(
 
         runCatching {
 
-            val key = appDataStoreRepository.encryptKeyFlow.first()
-                ?: crypto.generateKey(crypto.aesGCMKeySize)
-                    .also { appDataStoreRepository.setEncryptKey(it) }
+            val key = getEncryptionKey()
 
             val etitle = Json.encodeToString(s, crypto.encryptGcm(title.toByteArray(), key))
             val econtent = Json.encodeToString(s, crypto.encryptGcm(content.toByteArray(), key))
