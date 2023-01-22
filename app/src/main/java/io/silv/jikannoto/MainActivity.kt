@@ -60,6 +60,15 @@ class MainActivity : ComponentActivity() {
                             drawerState = drawerState,
                             navigationItems = viewModel.navigationItems,
                             selectedScreen = state.currScreens,
+                            darkTheme = state.darkTheme,
+                            name = state.username,
+                            imageUrl = state.imageUrl,
+                            onToggleDarkTheme = {
+                                viewModel.setDarkTheme()
+                            },
+                            onImageUrlChange = {
+                                viewModel.handleImageUrlChange(it)
+                            },
                             navigate = {
                                 viewModel.changeScreen(it)
                                 navHostController.navigate(it.route)
@@ -67,11 +76,6 @@ class MainActivity : ComponentActivity() {
                                     drawerState.close()
                                 }
                             },
-                            darkTheme = state.darkTheme,
-                            onToggleDarkTheme = {
-                                viewModel.setDarkTheme()
-                            },
-                            name = state.username
                         )
                     },
                     drawerState = drawerState,

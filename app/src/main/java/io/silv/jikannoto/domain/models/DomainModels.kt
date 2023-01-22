@@ -7,7 +7,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
 fun dateTimeNow(): LocalDateTime {
-    return Clock.System.now().toLocalDateTime(TimeZone.UTC)
+    return Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 }
 data class NotoItem(
     val id: String,

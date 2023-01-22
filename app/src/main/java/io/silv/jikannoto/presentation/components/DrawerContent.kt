@@ -22,7 +22,9 @@ fun DrawerContentNav(
     navigationItems: List<NavItem>,
     selectedScreen: Screens,
     name: Pair<String, String>,
+    imageUrl: String,
     darkTheme: Boolean,
+    onImageUrlChange: (String) -> Unit,
     onToggleDarkTheme: () -> Unit,
     navigate: (Screens) -> Unit
 ) {
@@ -51,6 +53,9 @@ fun DrawerContentNav(
                                     bottom = LocalSpacing.current.xl,
                                     top = LocalSpacing.current.xl
                                 )
+                                .height(150.dp),
+                            imageUrl = imageUrl,
+                            onImageUrlChange = { onImageUrlChange(it) }
                         )
                     }
                     item {

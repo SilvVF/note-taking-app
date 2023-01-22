@@ -11,8 +11,11 @@ import com.google.firebase.auth.FirebaseAuth
 import io.silv.jikannoto.data.AppDataStoreRepository
 import io.silv.jikannoto.presentation.navigation.Screens
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.ContainerHost
+import org.orbitmvi.orbit.annotation.OrbitExperimental
+import org.orbitmvi.orbit.syntax.simple.blockingIntent
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
@@ -22,9 +25,17 @@ class MainActivityViewModel(
     private val appDataStoreRepository: AppDataStoreRepository
 ) : ViewModel(), ContainerHost<AppState, AppGlobalEvent> {
 
-    override val container = container<AppState, AppGlobalEvent>(AppState())
+    override val container = container<AppState, AppGlobalEvent>(AppState()) {
+        init()
+    }
 
-    init {
+    private fun init() = intent {
+        val url = appDataStoreRepository.profileImageUrlFlow.first()
+        reduce {
+            state.copy(
+                imageUrl = url
+            )
+        }
         viewModelScope.launch {
             collectAppDataStoreData()
             firebaseAuth.addAuthStateListener {
@@ -43,12 +54,21 @@ class MainActivityViewModel(
                 state.copy(
                     loading = false,
                     darkTheme = data.darkTheme,
-                    username = data.firstname to data.lastName
+                    username = data.firstname to data.lastName,
                 )
             }
         }
     }
 
+    @OptIn(OrbitExperimental::class)
+    fun handleImageUrlChange(url: String) = blockingIntent {
+        reduce {
+            state.copy(
+                imageUrl = url
+            )
+        }
+        intent { appDataStoreRepository.setProfileImageUrl(url) }
+    }
     fun setDarkTheme() = intent {
         appDataStoreRepository.setDarkTheme(!state.darkTheme)
     }
@@ -82,6 +102,7 @@ data class AppState(
     val loading: Boolean = true,
     val username: Pair<String, String> = "" to "",
     val currScreens: Screens = Screens.CheckList,
+    val imageUrl: String = ""
 )
 data class NavItem(
     @DrawableRes val painter: Int? = null,

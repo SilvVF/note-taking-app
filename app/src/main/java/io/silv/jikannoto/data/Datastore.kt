@@ -58,7 +58,7 @@ class AppDataStoreRepository(
         }
     }
 
-    val darkThemeFlow: Flow<Boolean> = context.dataStore.data
+    private val darkThemeFlow: Flow<Boolean> = context.dataStore.data
         .map { preferences ->
             preferences[darkThemeKey] ?: false
         }.flowOn(dispatchers.io)
@@ -84,18 +84,30 @@ class AppDataStoreRepository(
         }
     }
 
+    val profileImageUrlFlow: Flow<String> = context.dataStore.data
+        .map { preferences: Preferences ->
+            preferences[profileImageUrlKey] ?: ""
+        }
+
+    suspend fun setProfileImageUrl(url: String) = context.dataStore
+        .edit { mutablePreferences ->
+            mutablePreferences[profileImageUrlKey] = url
+        }
+
     val collectAllFlow: Flow<DataStoreState> =
         combine(
             firstNameFlow,
             lastNameFlow,
             darkThemeFlow,
-            syncFlow
-        ) { firstName, lastName, darkTheme, sync ->
+            syncFlow,
+            profileImageUrlFlow
+        ) { firstName, lastName, darkTheme, sync, profileImage ->
             DataStoreState(
                 firstname = firstName,
                 lastName = lastName,
                 darkTheme = darkTheme,
-                sync = sync
+                sync = sync,
+                profileImage = profileImage
             )
         }.flowOn(dispatchers.io)
     companion object {
@@ -104,11 +116,13 @@ class AppDataStoreRepository(
         val darkThemeKey = booleanPreferencesKey("DARK_THEME_KEY")
         val syncKey = booleanPreferencesKey("SYNC_KEY")
         val encryptKey = stringPreferencesKey("ENCRYPT_KEY")
+        val profileImageUrlKey = stringPreferencesKey("PROFILE_IMAGE_URL_KEY")
     }
     data class DataStoreState(
         val firstname: String,
         val lastName: String,
         val darkTheme: Boolean,
-        val sync: Boolean = false
+        val sync: Boolean = false,
+        val profileImage: String = ""
     )
 }
