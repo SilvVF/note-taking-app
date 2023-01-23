@@ -9,6 +9,7 @@ import io.silv.jikannoto.domain.models.User
 import io.silv.jikannoto.domain.result.onException
 import io.silv.jikannoto.domain.result.onSuccess
 import io.silv.jikannoto.presentation.navigation.Screens
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.annotation.OrbitExperimental
@@ -22,16 +23,20 @@ class UserSettingsViewModel(
 
     override val container = container<UserSettingsState, UserSettingsScreenEffect>(UserSettingsState()) {
         intent {
-            val initial = appDataStoreRepository.collectAllFlow.first()
-            reduce {
-                state.copy(
-                    settings = Settings(
-                        darkTheme = initial.darkTheme,
-                        firstName = initial.firstname,
-                        lastName = initial.lastName,
-                        alwaysSync = initial.sync
+            coroutineScope {
+                val key = appDataStoreRepository.encryptKeyFlow.first()?.decodeToString() ?: ""
+                val initial = appDataStoreRepository.collectAllFlow.first()
+                reduce {
+                    state.copy(
+                        settings = Settings(
+                            darkTheme = initial.darkTheme,
+                            firstName = initial.firstname,
+                            lastName = initial.lastName,
+                            alwaysSync = initial.sync,
+                            key = key
+                        )
                     )
-                )
+                }
             }
             repeatOnSubscription {
                 userRepository.currentUserInfo().collect { user ->
@@ -55,6 +60,15 @@ class UserSettingsViewModel(
                 settings = state.settings.copy(darkTheme = !darkTheme)
             )
         }
+    }
+
+    fun encryptionKeyTextHandler(key: String) = blockingIntent {
+        reduce {
+            state.copy(
+                settings = state.settings.copy(key = key)
+            )
+        }
+        intent { appDataStoreRepository.setEncryptKey(key.encodeToByteArray()) }
     }
 
     fun usernameTextHandler(username: String) = blockingIntent {
@@ -129,6 +143,7 @@ data class Settings(
     val firstName: String = "",
     val lastName: String = "",
     val alwaysSync: Boolean = false,
+    val key: String = ""
 )
 
 sealed class UserSettingsScreenEffect {

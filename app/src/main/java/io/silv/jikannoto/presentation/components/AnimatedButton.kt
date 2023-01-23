@@ -28,9 +28,9 @@ fun AnimatedButton(
     enabled: Boolean = true,
     fontReductionScale: Float = 0.15f,
     label: String = "Click Me.",
-    animationSpec: AnimationSpec<Dp> = spring(),
-    heightSqueeze: Dp? = null,
-    widthSqueeze: Dp? = null,
+    animationSpec: AnimationSpec<Float> = spring(),
+    heightSqueeze: Dp = 2.dp,
+    widthSqueeze: Dp = 3.dp,
     onClick: () -> Unit,
 ) {
 
@@ -41,8 +41,8 @@ fun AnimatedButton(
                 onClick()
             }
         },
-        heightSqueeze = heightSqueeze ?: 2.dp,
-        widthSqueeze = heightSqueeze ?: 3.dp,
+        heightSqueeze = heightSqueeze,
+        widthSqueeze = widthSqueeze,
         animationSpec = animationSpec,
     ) { progress ->
 

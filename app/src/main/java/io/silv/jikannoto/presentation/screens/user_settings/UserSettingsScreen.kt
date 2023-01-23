@@ -149,6 +149,20 @@ fun UserSettingsScreen(
                                 onClick = { viewModel.sendPasswordReset(state.resetEmail) }
                             )
                         }
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            AnimatedHintTextField(
+                                text = state.settings.key,
+                                textChangeHandler = { viewModel.encryptionKeyTextHandler(it) },
+                                hint = "encryption key",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 16.dp, end = 8.dp)
+                            )
+                        }
                     }
                 }
             },
